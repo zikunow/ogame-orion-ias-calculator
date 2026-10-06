@@ -6,6 +6,8 @@ Compare Interstellar Anomaly Scanner upgrade costs, lithium production and relat
 
 Enter the number of planets, starting IAS level and target IAS level. Every selected planet is assumed to have the same IAS level and to receive every upgrade in the selected path.
 
+The interface is available in English and Russian. Use the EN / RU buttons next to GitHub to switch languages. The selection is remembered in this browser, and share links include a `lang` parameter. An explicit link language takes precedence over the remembered preference.
+
 ## Features
 
 - Upgrade costs in Metal, Crystal, Deuterium and Metal Standard Units (MSU).

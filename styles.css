@@ -339,3 +339,9 @@ button:focus-visible, a:focus-visible, .table-wrap:focus-visible { outline: 2px 
 button:disabled { opacity: .5; cursor: default; }
 .stat small { overflow-wrap: anywhere; }
 @media (min-width: 1051px) and (max-width: 1250px) { .controls { grid-template-columns: repeat(3, 1fr); } .ratio { grid-column: span 2; } }
+
+.header-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
+.language-switch { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.language-switch button { border: 0; background: transparent; color: var(--muted); padding: 10px; cursor: pointer; min-height: 44px; }
+.language-switch button[aria-pressed="true"] { background: rgba(101,198,255,.15); color: var(--accent); }
+@media (max-width: 680px) { .header-actions { margin-top: 18px; } .header-actions .github-link { margin-top: 0; } }

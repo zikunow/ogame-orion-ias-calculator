@@ -39,6 +39,24 @@ const { chromium } = require('playwright');
       assert.ok(!/NaN|Infinity/.test(await page.locator('#results').textContent()));
       assert.deepEqual(errors, []);
       console.log('PASS live calculator viewport ' + width + 'px');
+      await page.locator('#langRu').click();
+      assert.equal(await page.locator('html').getAttribute('lang'), 'ru');
+      assert.equal(await page.locator('#outputGain').textContent(), 'н/д');
+      assert.match(await page.locator('h1').textContent(), /Калькулятор/);
+      assert.match(await page.locator('#results').textContent(), /МСУ/);
+      await page.locator('#fromLevel').fill('2');
+      assert.match(await page.locator('#validation').textContent(), /выше начального/);
+      await page.locator('#fromLevel').fill('0');
+      await page.reload();
+      assert.equal(await page.locator('html').getAttribute('lang'), 'ru');
+      await page.goto('https://zikunow.github.io/ogame-orion-ias-calculator/');
+      assert.equal(await page.locator('html').getAttribute('lang'), 'ru');
+      const russianLayout = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
+      assert.ok(russianLayout.document <= russianLayout.viewport, JSON.stringify(russianLayout));
+      await page.locator('#langEn').click();
+      assert.equal(await page.locator('html').getAttribute('lang'), 'en');
+      assert.equal(await page.locator('#outputGain').textContent(), '+75.69%');
+      console.log('PASS EN/RU switch and persistence viewport ' + width + 'px');
       await context.close();
     }
   } finally { await browser.close(); }

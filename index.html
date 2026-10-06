@@ -11,59 +11,59 @@
   <main class="shell">
     <header class="hero">
       <div>
-        <p class="eyebrow">OGame · Project Orion</p>
-        <h1>Interstellar Anomaly Scanner Calculator</h1>
-        <p class="lede">Enter the number of planets to calculate the cost of upgrading the Interstellar Anomaly Scanner on every planet, total IAS, lithium production and the relative gain from each level.</p>
+        <p class="eyebrow" data-i18n="s0">OGame · Project Orion</p>
+        <h1 data-i18n="s1">Interstellar Anomaly Scanner Calculator</h1>
+        <p class="lede" data-i18n="s2">Enter the number of planets to calculate the cost of upgrading the Interstellar Anomaly Scanner on every planet, total IAS, lithium production and the relative gain from each level.</p>
       </div>
-      <a class="github-link" href="https://github.com/zikunow/ogame-orion-ias-calculator" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <nav class="header-actions" aria-label="Language and project links" data-i18n-aria="Language and project links"><div class="language-switch" role="group" aria-label="Language" data-i18n-aria="Language"><button id="langEn" type="button" aria-pressed="true">EN</button><button id="langRu" type="button" aria-pressed="false">RU</button></div><a class="github-link" href="https://github.com/zikunow/ogame-orion-ias-calculator" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
     </header>
 
-    <section class="panel controls" aria-label="Calculator settings">
+    <section class="panel controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
       <label>
-        <span>Number of planets</span>
+        <span data-i18n="s3">Number of planets</span>
         <input id="planets" type="number" min="1" max="50" step="1" value="18">
       </label>
       <label>
-        <span>Starting IAS level</span>
+        <span data-i18n="s4">Starting IAS level</span>
         <input id="fromLevel" type="number" min="0" max="79" step="1" value="55">
       </label>
       <label>
-        <span>Target IAS level</span>
+        <span data-i18n="s5">Target IAS level</span>
         <input id="toLevel" type="number" min="1" max="80" step="1" value="60">
       </label>
       <fieldset class="ratio">
-        <legend>MSU trade ratio</legend>
+        <legend data-i18n="s6">MSU trade ratio</legend>
         <div class="ratio-inputs">
-          <label><span>Metal</span><input id="ratioMetal" type="number" min="0.1" step="0.1" value="3"></label>
+          <label><span data-i18n="s7">Metal</span><input id="ratioMetal" type="number" min="0.1" step="0.1" value="3"></label>
           <span>:</span>
-          <label><span>Crystal</span><input id="ratioCrystal" type="number" min="0.1" step="0.1" value="2"></label>
+          <label><span data-i18n="s8">Crystal</span><input id="ratioCrystal" type="number" min="0.1" step="0.1" value="2"></label>
           <span>:</span>
-          <label><span>Deut</span><input id="ratioDeut" type="number" min="0.1" step="0.1" value="1"></label>
+          <label><span data-i18n="s9">Deut</span><input id="ratioDeut" type="number" min="0.1" step="0.1" value="1"></label>
         </div>
       </fieldset>
-      <button id="copyLink" class="secondary" type="button">Copy share link</button>
+      <button id="copyLink" class="secondary" type="button" data-i18n="s10">Copy share link</button>
     </section>
 
     <p id="validation" class="validation" role="alert" hidden></p>
 
-    <section class="summary-grid" aria-label="Summary">
+    <section class="summary-grid" aria-label="Summary" data-i18n-aria="Summary">
       <article class="stat">
-        <span>Upgrade cost</span>
+        <span data-i18n="s11">Upgrade cost</span>
         <strong id="upgradeCost">—</strong>
         <small id="upgradeCostExact">—</small>
       </article>
       <article class="stat">
-        <span>Lithium/hour</span>
+        <span data-i18n="s12">Lithium/hour</span>
         <strong id="targetLithium">—</strong>
         <small id="currentLithium">—</small>
       </article>
       <article class="stat">
-        <span>Output gain</span>
+        <span data-i18n="s13">Output gain</span>
         <strong id="outputGain">—</strong>
         <small id="outputMultiplier">—</small>
       </article>
       <article class="stat">
-        <span>Total IAS</span>
+        <span data-i18n="s14">Total IAS</span>
         <strong id="targetIas">—</strong>
         <small id="currentIas">—</small>
       </article>
@@ -73,26 +73,26 @@
     <section class="panel table-panel">
       <div class="section-head">
         <div>
-          <p class="eyebrow">Upgrade path</p>
+          <p class="eyebrow" data-i18n="s15">Upgrade path</p>
           <h2 id="tableTitle">Levels 55 → 60</h2>
         </div>
-        <p>Each row means upgrading <strong>every selected planet</strong> to that IAS level.</p>
+        <p data-i18n="s16">Each row means upgrading <strong>every selected planet</strong> to that IAS level.</p>
       </div>
 
-      <p class="table-hint">Scroll horizontally to compare every column. MSU / +1% uses each upgrade’s gain versus the previous level.</p>
-      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable upgrade results">
+      <p class="table-hint" data-i18n="s17">Scroll horizontally to compare every column. MSU / +1% uses each upgrade’s gain versus the previous level.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable upgrade results" data-i18n-aria="Scrollable upgrade results">
         <table>
           <thead>
             <tr>
               <th>Level</th>
-              <th>This level<br><span>all planets</span></th>
-              <th>Extra from start<br><span>MSU</span></th>
-              <th>Total invested<br><span>to this level</span></th>
-              <th>Total IAS</th>
-              <th>Lithium/hour<br><span>all planets</span></th>
-              <th>Gain vs prev.</th>
-              <th>Gain vs start</th>
-              <th>MSU / +1%</th>
+              <th data-i18n="s18">This level<br><span>all planets</span></th>
+              <th data-i18n="s19">Extra from start<br><span>MSU</span></th>
+              <th data-i18n="s20">Total invested<br><span>to this level</span></th>
+              <th data-i18n="s21">Total IAS</th>
+              <th data-i18n="s22">Lithium/hour<br><span>all planets</span></th>
+              <th data-i18n="s23">Gain vs prev.</th>
+              <th data-i18n="s24">Gain vs start</th>
+              <th data-i18n="s25">MSU / +1%</th>
             </tr>
           </thead>
           <tbody id="results"></tbody>
@@ -102,32 +102,32 @@
 
     <section class="panel formulas">
       <div>
-        <p class="eyebrow">Formulas used</p>
-        <h2>How it is calculated</h2>
+        <p class="eyebrow" data-i18n="s26">Formulas used</p>
+        <h2 data-i18n="s27">How it is calculated</h2>
       </div>
       <div class="formula-grid">
         <div>
-          <span>Level cost per planet</span>
-          <code>M/C/D = 84/42/14 × 1.4^(L−1)</code>
-          <small>Each resource is rounded to the nearest whole unit.</small>
+          <span data-i18n="s28">Level cost per planet</span>
+          <code data-i18n="s29">M/C/D = 84/42/14 × 1.4^(L−1)</code>
+          <small data-i18n="small0">Each resource is rounded to the nearest whole unit.</small>
         </div>
         <div>
-          <span>Lithium/hour per planet</span>
-          <code>floor(220 × L × 1.1^(L−1))</code>
-          <small>Matches observed in-game IAS values, including levels 20–34.</small>
+          <span data-i18n="s30">Lithium/hour per planet</span>
+          <code data-i18n="s31">floor(220 × L × 1.1^(L−1))</code>
+          <small data-i18n="small1">Matches observed in-game IAS values, including levels 20–34.</small>
         </div>
         <div>
-          <span>Default MSU (3:2:1)</span>
-          <code>MSU = Metal + 1.5 × Crystal + 3 × Deuterium</code>
-          <small>You can change the trade ratio above.</small>
+          <span data-i18n="s32">Default MSU (3:2:1)</span>
+          <code data-i18n="s33">MSU = Metal + 1.5 × Crystal + 3 × Deuterium</code>
+          <small data-i18n="small2">You can change the trade ratio above.</small>
         </div>
       </div>
-      <p class="note">“Output gain” refers to lithium/hour only. The Orion loot formula is unconfirmed; these percentages are not confirmed loot gains. Percentage gains from IAS 0 are undefined and shown as N/A.</p>
+      <p class="note" data-i18n="s34">“Output gain” refers to lithium/hour only. The Orion loot formula is unconfirmed; these percentages are not confirmed loot gains. Percentage gains from IAS 0 are undefined and shown as N/A.</p>
     </section>
 
     <footer>
-      <span>Unofficial community calculator for OGame Project Orion.</span>
-      <span>Mechanics may change while Orion is being tested.</span>
+      <span data-i18n="s35">Unofficial community calculator for OGame Project Orion.</span>
+      <span data-i18n="s36">Mechanics may change while Orion is being tested.</span>
     </footer>
   </main>
 
@@ -135,4 +135,5 @@
   <script src="app.js"></script>
 </body>
 </html>
+
 
