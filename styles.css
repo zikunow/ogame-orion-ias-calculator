@@ -420,3 +420,7 @@ html[data-theme="minimal"] .validation { background: #fff1f0; border-color: #f3b
 html[data-theme="minimal"] footer { color: var(--muted); }
 html[data-theme="minimal"] .chart-card h2 { font-size: 18px; }
 html[data-theme="minimal"] .chart-grid-line { stroke: #e4e7ec; }
+
+.efficiency-card { grid-column: 1 / -1; }
+.efficiency-card svg { max-width: 700px; max-height: none; margin-left: auto; margin-right: auto; }
+.efficiency-card .chart-description { min-height: 0; }

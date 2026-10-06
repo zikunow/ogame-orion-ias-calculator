@@ -57,3 +57,15 @@ test('chart series use the selected baseline and exclude undefined zero-output g
   assert.equal(c.run('gainSeries(0,1).previous.length'), 0);
   assert.equal(c.run('gainSeries(0,1).cumulative.length'), 0);
 });
+
+test('MSU per percentage point matches upgrade cost, scales with planets and responds to ratio', () => {
+  const c = calculator();
+  const before = c.run('lithiumPerPlanet(54)');
+  const after = c.run('lithiumPerPlanet(55)');
+  const cost = c.run('msu(scaleResources(costAtLevel(55),18),{metal:3,crystal:2,deut:1})');
+  assert.equal(c.run('msuPerPercentAtLevel(55,18,{metal:3,crystal:2,deut:1})'), cost/((after/before-1)*100));
+  assert.equal(c.run('msuPerPercentAtLevel(55,9,{metal:3,crystal:2,deut:1})'), cost/2/((after/before-1)*100));
+  assert.ok(c.run('msuPerPercentAtLevel(55,18,{metal:1,crystal:1,deut:1})') < cost/((after/before-1)*100));
+  assert.ok(c.run('Number.isNaN(msuPerPercentAtLevel(1,18,{metal:3,crystal:2,deut:1}))'));
+  assert.equal(c.run('efficiencySeries({fromLevel:50,toLevel:60,planets:18,ratio:{metal:3,crystal:2,deut:1}}).length'), 10);
+});

@@ -435,6 +435,33 @@ function updateUrl(state) {
 
 russian["Lithium output gain charts"] = "Графики прироста выработки лития";
 Object.assign(russian, {"Gain vs previous level":"Прирост к предыдущему уровню","Gain vs starting level":"Прирост к начальному уровню","Each point is the gain of that upgrade over the previous level.":"Каждая точка — прирост от этого улучшения относительно предыдущего уровня.","The starting level is 0%; each point compares output with that same starting level.":"Начальный уровень — 0%; каждая точка сравнивает выработку с этим же начальным уровнем.","These charts show lithium output, not confirmed loot gains or payback. Y axes use separate linear scales starting at zero.":"Графики показывают выработку лития, а не подтверждённый прирост лута или окупаемость. Шкалы Y отдельные, линейные, начинаются с нуля.","Select a point to see its exact gain.":"Выберите точку, чтобы увидеть точный прирост.","Gain, %":"Прирост, %","IAS level":"Уровень IAS","Level {level}: +{gain}":"Уровень {level}: +{gain}","Step gains: +{first} → +{last}":"Прирост за уровень: +{first} → +{last}","Total gain from level {start}: +{gain}":"Общий прирост от уровня {start}: +{gain}"});
+Object.assign(russian, {
+  "MSU per +1% output": "МСУ за +1% выработки",
+  "Upgrade MSU divided by its percentage gain versus the previous level. All selected planets; lower is cheaper.": "Цена улучшения в МСУ, делённая на прирост в процентах к предыдущему уровню. Для всех выбранных планет; ниже — дешевле.",
+  "Select a point to see its exact cost.": "Выберите точку, чтобы увидеть точную стоимость.",
+  "Level {level}: {cost} MSU / +1%": "Уровень {level}: {cost} МСУ / +1%",
+  "Cost per +1%: {first} → {last} MSU": "Цена +1%: {first} → {last} МСУ",
+  "MSU / +1%": "МСУ / +1%"
+});
+function msuPerPercentAtLevel(level, planets, ratio) {
+  const before = lithiumPerPlanet(level - 1);
+  if (!before) return NaN;
+  const gain = lithiumPerPlanet(level) / before - 1;
+  return msu(scaleResources(costAtLevel(level), planets), ratio) / (gain * 100);
+}
+function efficiencySeries(state) {
+  const points = [];
+  for (let level = state.fromLevel + 1; level <= state.toLevel; level++) {
+    const value = msuPerPercentAtLevel(level, state.planets, state.ratio);
+    if (Number.isFinite(value)) points.push({level, gain: value});
+  }
+  return points;
+}
+function pointLabel(level, value, unit) {
+  return unit === "msu"
+    ? t("Level {level}: {cost} MSU / +1%", {level, cost:fmt(value)})
+    : t("Level {level}: +{gain}", {level, gain:fmtPct(value)});
+}
 function gainSeries(start, target) {
   const baseline = lithiumPerPlanet(start);
   const previous = [], cumulative = [];
@@ -448,20 +475,21 @@ function gainSeries(start, target) {
   }
   return { previous, cumulative };
 }
-function gainChart(id, points, heading, description, insight) {
+function gainChart(id, points, heading, description, insight, unit = "percent") {
   if (!points.length) return '<article class="panel chart-card"><h2>' + t(heading) +
     '</h2><p>' + t("Percentage gain is undefined from zero output") + '</p></article>';
   const w = 420, h = 290, left = 76, right = 22, top = 36, bottom = 54;
-  const max = Math.max(...points.map(p => p.gain * 100), 1) * 1.08;
+  const scale = unit === "msu" ? 1 : 100;
+  const max = Math.max(...points.map(p => p.gain * scale), 1) * 1.08;
   const first = points[0].level, last = points.at(-1).level;
   const x = level => left + (last === first ? (w-left-right)/2 : (level-first)/(last-first)*(w-left-right));
-  const y = gain => h-bottom - gain*100/max*(h-top-bottom);
+  const y = gain => h-bottom - gain*scale/max*(h-top-bottom);
   let svg = '<svg viewBox="0 0 '+w+' '+h+'" role="group" aria-label="'+t(heading)+'">';
-  svg += '<text class="chart-axis-label" x="'+left+'" y="19">'+t("Gain, %")+'</text>';
+  svg += '<text class="chart-axis-label" x="'+left+'" y="19">'+t(unit === "msu" ? "MSU / +1%" : "Gain, %")+'</text>';
   for (let tick = 0; tick <= 4; tick++) {
-    const value = max*tick/4, yy = y(value/100);
+    const value = max*tick/4, yy = y(value/scale);
     svg += '<line class="chart-grid-line" x1="'+left+'" x2="'+(w-right)+'" y1="'+yy+'" y2="'+yy+'"/>';
-    svg += '<text class="chart-tick" x="'+(left-8)+'" y="'+(yy+5)+'" text-anchor="end">'+fmtCompact(value)+'%</text>';
+    svg += '<text class="chart-tick" x="'+(left-8)+'" y="'+(yy+5)+'" text-anchor="end">'+fmtCompact(value)+(unit === "msu" ? "" : "%")+'</text>';
   }
   const stride = Math.max(1, Math.ceil((last-first)/5));
   for (const point of points) {
@@ -471,25 +499,28 @@ function gainChart(id, points, heading, description, insight) {
   svg += '<text class="chart-axis-label" x="'+((left+w-right)/2)+'" y="'+(h-6)+'" text-anchor="middle">'+t("IAS level")+'</text>';
   svg += '<polyline class="chart-line" points="'+points.map(p=>x(p.level)+','+y(p.gain)).join(' ')+'"/>';
   for (const p of points) {
-    const label = t("Level {level}: +{gain}", {level:p.level,gain:fmtPct(p.gain)});
-    svg += '<circle class="chart-point" cx="'+x(p.level)+'" cy="'+y(p.gain)+'" r="4" tabindex="0" role="button" aria-label="'+label+'" data-chart="'+id+'" data-level="'+p.level+'" data-gain="'+p.gain+'"><title>'+label+'</title></circle>';
+    const label = pointLabel(p.level, p.gain, unit);
+    svg += '<circle class="chart-point" cx="'+x(p.level)+'" cy="'+y(p.gain)+'" r="4" tabindex="0" role="button" aria-label="'+label+'" data-chart="'+id+'" data-level="'+p.level+'" data-gain="'+p.gain+'" data-unit="'+unit+'"><title>'+label+'</title></circle>';
   }
   svg += '</svg>';
-  return '<article class="panel chart-card"><h2>'+t(heading)+'</h2><p class="chart-description">'+t(description)+'</p>'+
-    svg+'<p class="chart-insight">'+insight+'</p><p id="'+id+'Readout" class="chart-readout" aria-live="polite">'+t("Select a point to see its exact gain.")+'</p></article>';
+  return '<article class="panel chart-card'+(unit === "msu" ? ' efficiency-card' : '')+'"><h2>'+t(heading)+'</h2><p class="chart-description">'+t(description)+'</p>'+
+    svg+'<p class="chart-insight">'+insight+'</p><p id="'+id+'Readout" class="chart-readout" aria-live="polite">'+t(unit === "msu" ? "Select a point to see its exact cost." : "Select a point to see its exact gain.")+'</p></article>';
 }
 function renderCharts(state) {
   const series = gainSeries(state.fromLevel, state.toLevel);
   const prev = series.previous;
+  const efficiency = efficiencySeries(state);
+  const efficiencyInsight = efficiency.length ? t("Cost per +1%: {first} → {last} MSU", {first:fmtCompact(efficiency[0].gain),last:fmtCompact(efficiency.at(-1).gain)}) : "";
   const prevInsight = prev.length ? t("Step gains: +{first} → +{last}", {first:fmtPct(prev[0].gain),last:fmtPct(prev.at(-1).gain)}) : "";
   const totalInsight = series.cumulative.length ? t("Total gain from level {start}: +{gain}", {start:state.fromLevel,gain:fmtPct(series.cumulative.at(-1).gain)}) : "";
   $("gainCharts").innerHTML =
     '<div class="chart-grid">' +
     gainChart("stepChart",prev,"Gain vs previous level","Each point is the gain of that upgrade over the previous level.",prevInsight) +
     gainChart("totalChart",series.cumulative,"Gain vs starting level","The starting level is 0%; each point compares output with that same starting level.",totalInsight) +
+    gainChart("efficiencyChart",efficiency,"MSU per +1% output","Upgrade MSU divided by its percentage gain versus the previous level. All selected planets; lower is cheaper.",efficiencyInsight,"msu") +
     '</div><p class="chart-note">'+t("These charts show lithium output, not confirmed loot gains or payback. Y axes use separate linear scales starting at zero.")+'</p>';
   document.querySelectorAll(".chart-point").forEach(point => {
-    const show = () => $(point.dataset.chart+"Readout").textContent = t("Level {level}: +{gain}", {level:point.dataset.level,gain:fmtPct(Number(point.dataset.gain))});
+    const show = () => $(point.dataset.chart+"Readout").textContent = pointLabel(point.dataset.level, Number(point.dataset.gain), point.dataset.unit);
     point.addEventListener("mouseenter", show);
     point.addEventListener("focus", show);
     point.addEventListener("click", show);
@@ -551,7 +582,7 @@ function render() {
     const lithium = lithiumPerPlanet(level) * state.planets;
     const gainPrev = previousLithium ? lithium / previousLithium - 1 : NaN;
     const gainStart = startLithium ? lithium / startLithium - 1 : NaN;
-    const msuPerOnePercent = levelMsu / (gainPrev * 100);
+    const msuPerOnePercent = msuPerPercentAtLevel(level, state.planets, state.ratio);
 
     rows += "<tr>" +
       "<td><strong>" + level + "</strong><span class=\"sub\">" + (level - 1) + " → " + level + "</span></td>" +

@@ -29,7 +29,7 @@ Supported inputs: 1–50 planets, starting level 0–79 and target level 1–80,
 
 ## Output gain charts
 
-Two interactive charts above the upgrade table compare gain against the previous level and the selected starting level. X is the resulting IAS level; Y is lithium output gain in percent. The cumulative chart includes the starting level at 0%. Step gains cover only upgrades within the selected range. Both charts use linear Y axes starting at zero, with separate scales. Hover, focus or tap a point for its exact percentage. Gains relative to zero output are undefined and omitted.
+Three interactive charts above the upgrade table show gain against the previous level, gain against the selected starting level, and MSU per +1 percentage point of output gain. The cost chart sits below the two gain charts and uses the exact same metric as the last table column: each upgrade’s MSU across all selected planets divided by its percentage gain versus the previous level. Lower values mean cheaper additional relative output. Changing planet count or trade ratio updates this chart. X is the resulting IAS level; Y is lithium output gain in percent. The cumulative chart includes the starting level at 0%. Step gains cover only upgrades within the selected range. Both charts use linear Y axes starting at zero, with separate scales. Hover, focus or tap a point for its exact percentage or MSU cost. Gains relative to zero output are undefined and omitted.
 
 These are output comparisons, not confirmed loot scaling or payback estimates.
 
