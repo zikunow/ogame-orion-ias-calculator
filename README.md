@@ -8,6 +8,12 @@ Enter the number of planets, starting IAS level and target IAS level. Every sele
 
 The interface is available in English and Russian. Use the EN / RU buttons next to GitHub to switch languages. The selection is remembered in this browser, and share links include a `lang` parameter. An explicit link language takes precedence over the remembered preference.
 
+## Designs
+
+Use the Design selector beside EN / RU to choose **Minimal** or **Cosmic**. Minimal is a light, compact design inspired by the OGame RU Dashboard: #f5f7fb background, white surfaces, #d9e0ec borders and Inter / Segoe UI / Arial typography. Cosmic preserves the original dark design.
+
+Minimal is the default for new visitors. The selected design is remembered independently of language and included in share links as `theme=minimal` or `theme=cosmic`. Explicit link settings override saved preferences. Switching designs preserves calculator inputs and results.
+
 ## Features
 
 - Upgrade costs in Metal, Crystal, Deuterium and Metal Standard Units (MSU).

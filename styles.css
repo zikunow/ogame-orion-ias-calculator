@@ -362,3 +362,61 @@ button:disabled { opacity: .5; cursor: default; }
 .chart-readout { margin-bottom: 0; min-height: 36px; }
 .chart-note { margin: 10px 0 0; }
 @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+
+.theme-control { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.theme-control select { min-height: 44px; max-width: 145px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); padding: 0 9px; font: inherit; }
+.theme-control select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 1050px) { .hero { flex-direction: column; } .header-actions { flex-wrap: wrap; } }
+@media (max-width: 680px) { .header-actions { gap: 8px; } .theme-control { gap: 4px; } .theme-control select { max-width: 122px; } }
+
+html[data-theme="minimal"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-2: #eef3f9;
+  --line: #d9e0ec;
+  --text: #16202f;
+  --muted: #667085;
+  --accent: #3478d5;
+  --accent-2: #246f63;
+  --warning: #74531d;
+  --danger: #b42318;
+  --shadow: none;
+}
+html[data-theme="minimal"] body { background: var(--bg); font-family: Inter, "Segoe UI", Arial, sans-serif; }
+html[data-theme="minimal"] .shell { padding-top: 24px; }
+html[data-theme="minimal"] h1 { font-size: clamp(28px, 3vw, 38px); line-height: 1.05; letter-spacing: -.02em; font-weight: 700; }
+html[data-theme="minimal"] h2 { font-size: 20px; letter-spacing: 0; }
+html[data-theme="minimal"] .eyebrow { font-weight: 600; letter-spacing: .04em; color: var(--muted); }
+html[data-theme="minimal"] .lede { font-size: 16px; max-width: 850px; }
+html[data-theme="minimal"] .hero { margin-bottom: 20px; }
+html[data-theme="minimal"] .panel { background: #fff; border-radius: 6px; box-shadow: none; }
+html[data-theme="minimal"] .controls { background: transparent; border: 0; padding: 0 0 8px; box-shadow: none; }
+html[data-theme="minimal"] .controls > label > span,
+html[data-theme="minimal"] .ratio legend,
+html[data-theme="minimal"] .ratio label span { font-weight: 400; }
+html[data-theme="minimal"] input { background: #fff; color: var(--text); border-color: var(--line); border-radius: 6px; box-shadow: none; }
+html[data-theme="minimal"] input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(52,120,213,.12); }
+html[data-theme="minimal"] .github-link,
+html[data-theme="minimal"] .secondary { background: #fff; border-color: var(--line); border-radius: 6px; box-shadow: 0 1px 2px rgba(22,32,47,.08); }
+html[data-theme="minimal"] .github-link:hover,
+html[data-theme="minimal"] .secondary:hover { border-color: #b5c2d5; background: #eef3f9; }
+html[data-theme="minimal"] .language-switch { background: #fff; border-radius: 6px; }
+html[data-theme="minimal"] .language-switch button[aria-pressed="true"] { background: #e7f3f0; color: #246f63; }
+html[data-theme="minimal"] .stat { background: #fff; border-radius: 6px; padding: 14px; }
+html[data-theme="minimal"] .stat span { font-weight: 600; letter-spacing: 0; text-transform: none; }
+html[data-theme="minimal"] .stat strong { font-size: 28px; font-weight: 700; }
+html[data-theme="minimal"] th { background: #eef3f9; color: #3a4556; text-transform: none; letter-spacing: 0; font-size: 13px; }
+html[data-theme="minimal"] th span { color: var(--muted); font-size: 11px; }
+html[data-theme="minimal"] td { font-size: 14px; }
+html[data-theme="minimal"] th,
+html[data-theme="minimal"] td { padding: 10px 12px; border-bottom-color: #e4e7ec; }
+html[data-theme="minimal"] td .sub { color: var(--muted); font-size: 11px; }
+html[data-theme="minimal"] tbody tr:hover { background: #f5f7fb; }
+html[data-theme="minimal"] .cost { color: var(--text); }
+html[data-theme="minimal"] .formula-grid > div { background: #f8fafc; border-color: var(--line); border-radius: 6px; }
+html[data-theme="minimal"] .formula-grid code { color: #3a4556; }
+html[data-theme="minimal"] .validation { background: #fff1f0; border-color: #f3b8b3; color: #b42318; border-radius: 6px; }
+html[data-theme="minimal"] footer { color: var(--muted); }
+html[data-theme="minimal"] .chart-card h2 { font-size: 18px; }
+html[data-theme="minimal"] .chart-grid-line { stroke: #e4e7ec; }

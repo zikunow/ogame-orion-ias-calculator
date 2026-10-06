@@ -78,6 +78,22 @@ const { chromium } = require('playwright');
       assert.equal(await page.locator('#outputGain').textContent(), '+75.69%');
       assert.equal(await page.locator('#gainCharts svg').count(), 2);
       console.log('PASS EN/RU switch and persistence viewport ' + width + 'px');
+      for (const design of ['cosmic', 'minimal']) {
+        await page.locator('#themeSelect').selectOption(design);
+        assert.equal(await page.locator('html').getAttribute('data-theme'), design);
+        assert.equal(await page.locator('#outputGain').textContent(), '+75.69%');
+        const themeLayout = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth, background: getComputedStyle(document.body).backgroundColor }));
+        assert.ok(themeLayout.document <= themeLayout.viewport, JSON.stringify(themeLayout));
+        if (design === 'minimal') assert.equal(themeLayout.background, 'rgb(245, 247, 251)');
+        await page.reload();
+        assert.equal(await page.locator('html').getAttribute('data-theme'), design);
+        await page.goto('https://zikunow.github.io/ogame-orion-ias-calculator/?lang=ru');
+        assert.equal(await page.locator('html').getAttribute('data-theme'), design);
+        const ruThemeLayout = await page.evaluate(() => ({viewport:innerWidth,document:document.documentElement.scrollWidth}));
+        assert.ok(ruThemeLayout.document <= ruThemeLayout.viewport, JSON.stringify(ruThemeLayout));
+        await page.locator('#langEn').click();
+      }
+      console.log('PASS both designs and persistence viewport ' + width + 'px');
       await context.close();
     }
   } finally { await browser.close(); }

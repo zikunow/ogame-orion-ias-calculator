@@ -260,6 +260,25 @@ const staticTranslations = {
   }
 };
 staticTranslations.level = { en: "Level", ru: "Уровень" };
+staticTranslations.themeLabel = { en: "Design", ru: "Дизайн" };
+staticTranslations.themeMinimal = { en: "Minimal", ru: "Минимализм" };
+staticTranslations.themeCosmic = { en: "Cosmic", ru: "Космос" };
+russian.Design = "Дизайн";
+let theme = "minimal";
+function setTheme(next, persist = true) {
+  theme = next === "cosmic" ? "cosmic" : "minimal";
+  if (document.documentElement?.setAttribute) document.documentElement.setAttribute("data-theme", theme);
+  $("themeSelect").value = theme;
+  if (persist) { try { localStorage.setItem("ias-theme", theme); } catch {} }
+  const url = new URL(window.location.href);
+  url.searchParams.set("theme", theme);
+  window.history.replaceState({}, "", url);
+}
+function initialTheme() {
+  const urlTheme = new URLSearchParams(window.location.search).get("theme");
+  if (urlTheme === "minimal" || urlTheme === "cosmic") return urlTheme;
+  try { return localStorage.getItem("ias-theme") === "cosmic" ? "cosmic" : "minimal"; } catch { return "minimal"; }
+}
 function t(text, values = {}) {
   let translated = language === "ru" ? (russian[text] ?? text) : text;
   for (const [key, value] of Object.entries(values)) translated = translated.replaceAll("{" + key + "}", value);
@@ -582,6 +601,8 @@ els.copyLink.addEventListener("click", async () => {
 });
 
 loadFromUrl();
+$("themeSelect").addEventListener("change", event => setTheme(event.target.value));
+setTheme(initialTheme(), false);
 $("langEn").addEventListener("click", () => setLanguage("en"));
 $("langRu").addEventListener("click", () => setLanguage("ru"));
 setLanguage(initialLanguage(), false);
