@@ -284,6 +284,13 @@ function t(text, values = {}) {
   for (const [key, value] of Object.entries(values)) translated = translated.replaceAll("{" + key + "}", value);
   return translated;
 }
+Object.assign(staticTranslations, {
+  ratioMenu: { en: "Trade ratio", ru: "Курс ресурсов" },
+  ratioHelp: { en: "Metal : Crystal : Deuterium. Default: 3:2:1.", ru: "Металл : Кристалл : Дейтерий. По умолчанию: 3:2:1." },
+  showCharts: { en: "Show charts", ru: "Показать графики" },
+  hideCharts: { en: "Hide charts", ru: "Скрыть графики" },
+  chartsCaption: { en: "Output gain and MSU per +1%", ru: "Прирост выработки и МСУ за +1%" }
+});
 function setLanguage(next, persist = true) {
   language = next === "ru" ? "ru" : "en";
   const locale = language === "ru" ? "ru-RU" : "en-US";
@@ -531,6 +538,8 @@ function renderCharts(state) {
 }
 
 function render() {
+  const ratioValue = $("ratioValue");
+  if (ratioValue) ratioValue.textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
   const state = readState();
   const error = validate(state);
 

@@ -93,3 +93,5 @@ Checks cover supplied lithium values, cost scaling, cumulative totals, custom MS
 GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks and uploads only `index.html`, `styles.css`, `app.js` and `.nojekyll`, then deploys on pushes to `main` or manual dispatch.
 
 Pages must first be enabled in **Settings → Pages → Build and deployment → Source: GitHub Actions**. The regular workflow `GITHUB_TOKEN` can deploy an enabled site but cannot perform its initial enablement. The previous failure at Configure Pages was caused by trying to enable the site using that token.
+
+Trade ratio settings live in a compact header menu (default Metal : Crystal : Deuterium = 3:2:1). The three charts are collapsed by default; use **Show charts** above the table to expand them, and **Hide charts** to collapse them again. Both controls support English/Russian and both designs.

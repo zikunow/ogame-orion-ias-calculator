@@ -424,3 +424,31 @@ html[data-theme="minimal"] .chart-grid-line { stroke: #e4e7ec; }
 .efficiency-card { grid-column: 1 / -1; }
 .efficiency-card svg { max-width: 700px; max-height: none; margin-left: auto; margin-right: auto; }
 .efficiency-card .chart-description { min-height: 0; }
+
+/* Secondary settings and charts stay out of the main calculation flow. */
+.controls { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+.ratio-menu { position: relative; }
+.ratio-menu summary, .charts-panel summary { cursor: pointer; list-style: none; }
+.ratio-menu summary::-webkit-details-marker, .charts-panel summary::-webkit-details-marker { display: none; }
+.ratio-menu summary { padding: 10px 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); white-space: nowrap; }
+.ratio-menu summary::after { content: " ▾"; }
+.ratio-menu[open] summary::after { content: " ▴"; }
+#ratioValue { color: var(--muted); margin-left: 5px; }
+.ratio-popover { position: absolute; top: calc(100% + 8px); right: 0; width: 310px; padding: 16px; z-index: 10; background: #102230; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.16); }
+.ratio-popover p { margin: 12px 0 0; color: var(--muted); font-size: 12px; }
+html[data-theme="minimal"] .ratio-popover { background: #fff; }
+.charts-panel { margin: 16px 0 22px; }
+.charts-panel > summary { display: flex; align-items: center; gap: 12px; padding: 16px; font-weight: 600; }
+.charts-panel > summary::before { content: "+"; color: var(--accent); font-size: 20px; }
+.charts-panel[open] > summary::before { content: "−"; }
+.charts-caption { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--muted); }
+.charts-open, .charts-panel[open] .charts-closed { display: none; }
+.charts-panel[open] .charts-open { display: inline; }
+.charts-panel .gain-charts { margin: 0; padding: 0 14px 14px; }
+.ratio-menu summary:focus-visible, .charts-panel summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 700px) {
+  .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ratio-popover { width: min(310px, calc(100vw - 32px)); }
+  .charts-caption { display: none; }
+}
+@media (max-width: 400px) { .controls { grid-template-columns: 1fr; } }
