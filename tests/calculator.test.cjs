@@ -45,3 +45,15 @@ test('18 planets, 55 to 60, and invalid/zero-start interface behavior', () => {
   c.run('render()');
   assert.match(c.elements.validation.textContent, /finite/);
 });
+
+test('chart series use the selected baseline and exclude undefined zero-output gains', () => {
+  const c = calculator();
+  assert.equal(c.run('gainSeries(55,60).previous.length'), 5);
+  assert.equal(c.run('gainSeries(55,60).cumulative.length'), 6);
+  assert.equal(c.run('gainSeries(55,60).cumulative[0].gain'), 0);
+  assert.equal(c.run('gainSeries(55,60).cumulative.at(-1).gain'), 65768022/37433700-1);
+  assert.ok(c.run('gainSeries(1,60).previous.every((p,i,a) => !i || p.gain < a[i-1].gain)'));
+  assert.ok(c.run('gainSeries(1,60).cumulative.every((p,i,a) => !i || p.gain > a[i-1].gain)'));
+  assert.equal(c.run('gainSeries(0,1).previous.length'), 0);
+  assert.equal(c.run('gainSeries(0,1).cumulative.length'), 0);
+});

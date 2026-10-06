@@ -21,6 +21,12 @@ The interface is available in English and Russian. Use the EN / RU buttons next 
 
 Supported inputs: 1–50 planets, starting level 0–79 and target level 1–80, with target greater than start. These are calculator limits, not claimed game limits. Trade ratios must be positive finite numbers.
 
+## Output gain charts
+
+Two interactive charts above the upgrade table compare gain against the previous level and the selected starting level. X is the resulting IAS level; Y is lithium output gain in percent. The cumulative chart includes the starting level at 0%. Step gains cover only upgrades within the selected range. Both charts use linear Y axes starting at zero, with separate scales. Hover, focus or tap a point for its exact percentage. Gains relative to zero output are undefined and omitted.
+
+These are output comparisons, not confirmed loot scaling or payback estimates.
+
 ## Calculation
 
 For level `L >= 1`, base resource costs are 84 Metal, 42 Crystal and 14 Deuterium:

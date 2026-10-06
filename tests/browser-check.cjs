@@ -13,6 +13,14 @@ const { chromium } = require('playwright');
       await page.locator('#outputGain').waitFor();
       assert.equal(await page.locator('#outputGain').textContent(), '+75.69%');
       assert.equal(await page.locator('#results tr').count(), 5);
+      assert.equal(await page.locator('#gainCharts svg').count(), 2);
+      assert.equal(await page.locator('[data-chart="stepChart"]').count(), 5);
+      assert.equal(await page.locator('[data-chart="totalChart"]').count(), 6);
+      assert.equal(await page.locator('[data-chart="totalChart"]').first().getAttribute('data-gain'), '0');
+      const totalGain = Number(await page.locator('[data-chart="totalChart"]').last().getAttribute('data-gain'));
+      assert.ok(Math.abs(totalGain - 0.756919) < 0.00001);
+      await page.locator('[data-chart="totalChart"]').last().click();
+      assert.match(await page.locator('#totalChartReadout').textContent(), /75.69%/);
       const layout = await page.evaluate(() => ({
         viewport: innerWidth, document: document.documentElement.scrollWidth,
         inputsFit: [...document.querySelectorAll('input')].every(el => {
@@ -36,6 +44,7 @@ const { chromium } = require('playwright');
       await page.locator('#fromLevel').fill('0');
       await page.locator('#toLevel').fill('1');
       assert.equal(await page.locator('#outputGain').textContent(), 'N/A');
+      assert.equal(await page.locator('#gainCharts svg').count(), 0);
       assert.ok(!/NaN|Infinity/.test(await page.locator('#results').textContent()));
       assert.deepEqual(errors, []);
       console.log('PASS live calculator viewport ' + width + 'px');
@@ -61,6 +70,7 @@ const { chromium } = require('playwright');
       await page.locator('#langEn').click();
       assert.equal(await page.locator('html').getAttribute('lang'), 'en');
       assert.equal(await page.locator('#outputGain').textContent(), '+75.69%');
+      assert.equal(await page.locator('#gainCharts svg').count(), 2);
       console.log('PASS EN/RU switch and persistence viewport ' + width + 'px');
       await context.close();
     }
