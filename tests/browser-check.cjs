@@ -43,6 +43,7 @@ const { chromium } = require('playwright');
       assert.equal(await page.locator('html').getAttribute('lang'), 'ru');
       assert.equal(await page.locator('#outputGain').textContent(), 'н/д');
       assert.match(await page.locator('h1').textContent(), /Калькулятор/);
+      assert.equal(await page.locator('th').first().textContent(), 'Уровень');
       assert.match(await page.locator('#results').textContent(), /МСУ/);
       await page.locator('#fromLevel').fill('2');
       assert.match(await page.locator('#validation').textContent(), /выше начального/);

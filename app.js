@@ -259,6 +259,7 @@ const staticTranslations = {
     "ru": "Курс ресурсов можно изменить выше."
   }
 };
+staticTranslations.level = { en: "Level", ru: "Уровень" };
 function t(text, values = {}) {
   let translated = language === "ru" ? (russian[text] ?? text) : text;
   for (const [key, value] of Object.entries(values)) translated = translated.replaceAll("{" + key + "}", value);
