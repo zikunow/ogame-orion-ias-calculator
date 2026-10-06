@@ -330,3 +330,11 @@ footer {
   .formula-grid { grid-template-columns: 1fr; }
   footer { flex-direction: column; }
 }
+
+
+.resource-totals { color: var(--text); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.table-hint { padding: 0 18px; color: var(--muted); font-size: 12px; }
+button:focus-visible, a:focus-visible, .table-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:disabled { opacity: .5; cursor: default; }
+.stat small { overflow-wrap: anywhere; }
+@media (min-width: 1051px) and (max-width: 1250px) { .controls { grid-template-columns: repeat(3, 1fr); } .ratio { grid-column: span 2; } }

@@ -13,7 +13,7 @@
       <div>
         <p class="eyebrow">OGame · Project Orion</p>
         <h1>Interstellar Anomaly Scanner Calculator</h1>
-        <p class="lede">Compare the MSU investment and lithium/hour gain from upgrading IAS across all of your planets.</p>
+        <p class="lede">Enter the number of planets to calculate the cost of upgrading the Interstellar Anomaly Scanner on every planet, total IAS, lithium production and the relative gain from each level.</p>
       </div>
       <a class="github-link" href="https://github.com/zikunow/ogame-orion-ias-calculator" target="_blank" rel="noreferrer">GitHub ↗</a>
     </header>
@@ -25,11 +25,11 @@
       </label>
       <label>
         <span>Starting IAS level</span>
-        <input id="fromLevel" type="number" min="1" max="79" step="1" value="55">
+        <input id="fromLevel" type="number" min="0" max="79" step="1" value="55">
       </label>
       <label>
         <span>Target IAS level</span>
-        <input id="toLevel" type="number" min="2" max="80" step="1" value="60">
+        <input id="toLevel" type="number" min="1" max="80" step="1" value="60">
       </label>
       <fieldset class="ratio">
         <legend>MSU trade ratio</legend>
@@ -69,6 +69,7 @@
       </article>
     </section>
 
+    <p id="resourceTotals" class="resource-totals" aria-live="polite">—</p>
     <section class="panel table-panel">
       <div class="section-head">
         <div>
@@ -78,7 +79,8 @@
         <p>Each row means upgrading <strong>every selected planet</strong> to that IAS level.</p>
       </div>
 
-      <div class="table-wrap">
+      <p class="table-hint">Scroll horizontally to compare every column. MSU / +1% uses each upgrade’s gain versus the previous level.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable upgrade results">
         <table>
           <thead>
             <tr>
@@ -120,7 +122,7 @@
           <small>You can change the trade ratio above.</small>
         </div>
       </div>
-      <p class="note">“Output gain” refers to IAS lithium conversion output. If Orion reward scaling is confirmed to be directly proportional to this value, the same percentage can be used as the relative reward gain.</p>
+      <p class="note">“Output gain” refers to lithium/hour only. The Orion loot formula is unconfirmed; these percentages are not confirmed loot gains. Percentage gains from IAS 0 are undefined and shown as N/A.</p>
     </section>
 
     <footer>
@@ -129,6 +131,8 @@
     </footer>
   </main>
 
+  <noscript><p>This calculator requires JavaScript. Please enable it to see the results.</p></noscript>
   <script src="app.js"></script>
 </body>
 </html>
+

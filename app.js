@@ -21,29 +21,27 @@ const els = {
   results: $("results")
 };
 
-const integer = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+const integer = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 const compact = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 });
 const percent = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function costAtLevel(level) {
-  const f = Math.pow(1.4, level - 1);
-  return {
-    metal: Math.round(84 * f),
-    crystal: Math.round(42 * f),
-    deut: Math.round(14 * f)
-  };
+  if (level === 0) return { metal: 0, crystal: 0, deut: 0 };
+  // Rational arithmetic avoids floating point errors at whole-unit boundaries.
+  const numerator = 7n ** BigInt(level - 1);
+  const denominator = 5n ** BigInt(level - 1);
+  const rounded = (base) => Number((BigInt(base) * numerator * 2n + denominator) / (2n * denominator));
+  return { metal: rounded(84), crystal: rounded(42), deut: rounded(14) };
 }
 
 function lithiumPerPlanet(level) {
-  return Math.floor(220 * level * Math.pow(1.1, level - 1));
+  if (level === 0) return 0;
+  return Number(220n * BigInt(level) * 11n ** BigInt(level - 1) / (10n ** BigInt(level - 1)));
 }
 
 function msu(resources, ratio) {
-  return Math.ceil(
-    resources.metal +
-    resources.crystal * (ratio.metal / ratio.crystal) +
-    resources.deut * (ratio.metal / ratio.deut)
-  );
+  return resources.metal + resources.crystal * (ratio.metal / ratio.crystal) +
+    resources.deut * (ratio.metal / ratio.deut);
 }
 
 function scaleResources(resources, multiplier) {
@@ -78,15 +76,19 @@ function upgradeResources(fromLevel, toLevel, planets) {
   return total;
 }
 
+function inputNumber(el) {
+  return el.value.trim() === "" ? NaN : Number(el.value);
+}
+
 function readState() {
   return {
-    planets: Number(els.planets.value),
-    fromLevel: Number(els.fromLevel.value),
-    toLevel: Number(els.toLevel.value),
+    planets: inputNumber(els.planets),
+    fromLevel: inputNumber(els.fromLevel),
+    toLevel: inputNumber(els.toLevel),
     ratio: {
-      metal: Number(els.ratioMetal.value),
-      crystal: Number(els.ratioCrystal.value),
-      deut: Number(els.ratioDeut.value)
+      metal: inputNumber(els.ratioMetal),
+      crystal: inputNumber(els.ratioCrystal),
+      deut: inputNumber(els.ratioDeut)
     }
   };
 }
@@ -95,15 +97,16 @@ function validate(state) {
   if (!Number.isInteger(state.planets) || state.planets < 1 || state.planets > 50) {
     return "Number of planets must be an integer from 1 to 50.";
   }
-  if (!Number.isInteger(state.fromLevel) || state.fromLevel < 1 || state.fromLevel > 79) {
-    return "Starting IAS level must be an integer from 1 to 79.";
+  if (!Number.isInteger(state.fromLevel) || state.fromLevel < 0 || state.fromLevel > 79) {
+    return "Starting IAS level must be an integer from 0 to 79.";
   }
-  if (!Number.isInteger(state.toLevel) || state.toLevel < 2 || state.toLevel > 80) {
-    return "Target IAS level must be an integer from 2 to 80.";
+  if (!Number.isInteger(state.toLevel) || state.toLevel < 1 || state.toLevel > 80) {
+    return "Target IAS level must be an integer from 1 to 80.";
   }
   if (state.toLevel <= state.fromLevel) {
     return "Target IAS level must be higher than the starting level.";
   }
+  if (!Object.values(state.ratio).every(Number.isFinite)) return "MSU ratio values must be finite numbers.";
   if (!state.ratio.metal || !state.ratio.crystal || !state.ratio.deut ||
       state.ratio.metal <= 0 || state.ratio.crystal <= 0 || state.ratio.deut <= 0) {
     return "MSU ratio values must be greater than zero.";
@@ -149,14 +152,18 @@ function render() {
 
   if (error) {
     els.results.innerHTML = "";
+    ["upgradeCost", "upgradeCostExact", "targetLithium", "currentLithium", "outputGain", "outputMultiplier", "targetIas", "currentIas", "resourceTotals"].forEach(id => $(id).textContent = "—");
+    els.tableTitle.textContent = "Check your inputs";
+    els.copyLink.disabled = true;
     return;
   }
 
+  els.copyLink.disabled = false;
   updateUrl(state);
 
   const startLithium = lithiumPerPlanet(state.fromLevel) * state.planets;
   const targetLithium = lithiumPerPlanet(state.toLevel) * state.planets;
-  const gain = targetLithium / startLithium - 1;
+  const gain = startLithium ? targetLithium / startLithium - 1 : NaN;
   const upgrade = upgradeResources(state.fromLevel, state.toLevel, state.planets);
   const upgradeMsu = msu(upgrade, state.ratio);
 
@@ -164,8 +171,9 @@ function render() {
   els.upgradeCostExact.textContent = fmt(upgradeMsu) + " MSU · " + resourceLine(upgrade);
   els.targetLithium.textContent = fmtCompact(targetLithium) + "/h";
   els.currentLithium.textContent = "From " + fmt(startLithium) + "/h to " + fmt(targetLithium) + "/h";
-  els.outputGain.textContent = "+" + fmtPct(gain);
-  els.outputMultiplier.textContent = "×" + (targetLithium / startLithium).toFixed(4) + " vs level " + state.fromLevel;
+  els.outputGain.textContent = Number.isFinite(gain) ? "+" + fmtPct(gain) : "N/A";
+  els.outputMultiplier.textContent = startLithium ? "×" + (targetLithium / startLithium).toFixed(4) + " vs level " + state.fromLevel : "Percentage gain is undefined from zero output";
+  $("resourceTotals").textContent = "All planets: Metal " + fmt(upgrade.metal) + " · Crystal " + fmt(upgrade.crystal) + " · Deuterium " + fmt(upgrade.deut);
   els.targetIas.textContent = fmt(state.toLevel * state.planets);
   els.currentIas.textContent = "From " + fmt(state.fromLevel * state.planets) + " IAS";
   els.tableTitle.textContent = "Levels " + state.fromLevel + " → " + state.toLevel;
@@ -184,22 +192,22 @@ function render() {
 
     const previousLithium = lithiumPerPlanet(level - 1) * state.planets;
     const lithium = lithiumPerPlanet(level) * state.planets;
-    const gainPrev = lithium / previousLithium - 1;
-    const gainStart = lithium / startLithium - 1;
+    const gainPrev = previousLithium ? lithium / previousLithium - 1 : NaN;
+    const gainStart = startLithium ? lithium / startLithium - 1 : NaN;
     const msuPerOnePercent = levelMsu / (gainPrev * 100);
 
     rows += "<tr>" +
       "<td><strong>" + level + "</strong><span class=\"sub\">" + (level - 1) + " → " + level + "</span></td>" +
       "<td class=\"cost\"><strong>" + fmtCompact(levelMsu) + " MSU</strong><span class=\"sub\" title=\"" +
         "Metal " + fmt(allPlanets.metal) + ", Crystal " + fmt(allPlanets.crystal) + ", Deuterium " + fmt(allPlanets.deut) +
-        "\">" + resourceLine(allPlanets) + "</span></td>" +
-      "<td>" + fmtCompact(extraMsu) + "</td>" +
-      "<td>" + fmtCompact(investedMsu) + "</td>" +
+        "\">" + "M " + fmt(allPlanets.metal) + " · C " + fmt(allPlanets.crystal) + " · D " + fmt(allPlanets.deut) + "</span></td>" +
+      "<td title=\"" + fmt(extraMsu) + " MSU\">" + fmtCompact(extraMsu) + "</td>" +
+      "<td title=\"" + fmt(investedMsu) + " MSU\">" + fmtCompact(investedMsu) + "</td>" +
       "<td>" + fmt(level * state.planets) + "</td>" +
       "<td><strong>" + fmt(lithium) + "</strong><span class=\"sub\">" + fmt(lithiumPerPlanet(level)) + " / planet</span></td>" +
-      "<td class=\"positive\">+" + fmtPct(gainPrev) + "</td>" +
-      "<td class=\"positive\">+" + fmtPct(gainStart) + "</td>" +
-      "<td>" + fmtCompact(msuPerOnePercent) + "</td>" +
+      "<td class=\"positive\">" + (Number.isFinite(gainPrev) ? "+" + fmtPct(gainPrev) : "N/A") + "</td>" +
+      "<td class=\"positive\">" + (Number.isFinite(gainStart) ? "+" + fmtPct(gainStart) : "N/A") + "</td>" +
+      "<td>" + (Number.isFinite(msuPerOnePercent) ? fmtCompact(msuPerOnePercent) : "N/A") + "</td>" +
     "</tr>";
   }
 
@@ -237,3 +245,4 @@ els.copyLink.addEventListener("click", async () => {
 
 loadFromUrl();
 render();
+

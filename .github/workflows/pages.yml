@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -25,15 +25,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Check calculator
+        run: node --test tests/calculator.test.cjs
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
+
+      - name: Prepare static site
+        run: |
+          mkdir _site
+          cp index.html styles.css app.js .nojekyll _site/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "."
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
