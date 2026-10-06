@@ -55,6 +55,10 @@ const { chromium } = require('playwright');
       await page.locator('#toLevel').fill('21');
       assert.equal(await page.locator('#currentLithium').textContent(), 'From 26,909/h to 31,081/h');
       await page.locator('#ratioMenu > summary').click();
+      const ratioFits = await page.locator('.ratio-popover').evaluate(el => {
+        const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth;
+      });
+      assert.ok(ratioFits, 'Trade ratio menu must fit the viewport');
       await page.locator('#ratioMetal').fill('1');
       await page.locator('#ratioCrystal').fill('1');
       assert.match(await page.locator('#upgradeCostExact').textContent(), /^117,136 MSU/);
