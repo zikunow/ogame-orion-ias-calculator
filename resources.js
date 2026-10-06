@@ -100,11 +100,11 @@ function renderResources() {
   els.currentIas.textContent = pp((start - 1) * 100) + " → " + pp((target - 1) * 100);
   $("resourceTotals").textContent = exact(total);
   $("buildingInfo").textContent = building[language] + (language === "ru" ? " · Открытие: завершить миссию аномалии уровня " : " · Unlock: complete an anomaly mission of level ") + building.unlock + (language === "ru" ? " · Базовая цена: " : " · Base cost: ") + exact(resourceCostAtLevel(1, $("resourceSelect").value));
-  els.tableTitle.textContent = t("Levels {from} → {to}", {from:state.fromLevel,to:state.toLevel});
+  els.tableTitle.textContent = t("Levels {start} → {target}", {start:state.fromLevel,target:state.toLevel});
   const rows = [];
   for (let level = state.fromLevel + 1; level <= state.toLevel; level++) {
     const cost = scaleResources(costAtLevel(level), state.planets), factor = resourceFactor(level);
-    rows.push("<tr><td><strong>" + level + "</strong><small>" + (level-1) + " → " + level + "</small></td><td><strong>" + fmtCompact(msu(cost,state.ratio)) + " " + t("MSU") + "</strong><small>" + exact(cost) + "</small></td><td>" + fmtCompact(msu(upgradeResources(state.fromLevel,level,state.planets),state.ratio)) + "</td><td>" + fmtCompact(msu(cumulativeResources(level,state.planets),state.ratio)) + "</td><td>" + fmt(level * state.planets) + "</td><td><strong>+" + pp((factor-1)*100) + "</strong><small>+" + pp(0.2*level) + (language === "ru" ? " / подздание" : " / building") + "</small></td><td>+" + fmtPct(factor / resourceFactor(level-1)-1) + "</td><td>+" + fmtPct(factor/start-1) + "</td><td>" + fmtCompact(msuPerPercentAtLevel(level,state.planets,state.ratio)) + "</td></tr>");
+    rows.push("<tr><td><strong>" + level + "</strong><small class='sub'>" + (level-1) + " → " + level + "</small></td><td><strong>" + fmtCompact(msu(cost,state.ratio)) + " " + t("MSU") + "</strong><small class='sub'>" + exact(cost) + "</small></td><td>" + fmtCompact(msu(upgradeResources(state.fromLevel,level,state.planets),state.ratio)) + "</td><td>" + fmtCompact(msu(cumulativeResources(level,state.planets),state.ratio)) + "</td><td>" + fmt(level * state.planets) + "</td><td><strong>+" + pp((factor-1)*100) + "</strong><small class='sub'>+" + pp(0.2*level) + (language === "ru" ? " / подздание" : " / building") + "</small></td><td>+" + fmtPct(factor / resourceFactor(level-1)-1) + "</td><td>+" + fmtPct(factor/start-1) + "</td><td>" + fmtCompact(msuPerPercentAtLevel(level,state.planets,state.ratio)) + "</td></tr>");
   }
   els.results.innerHTML = rows.join("");
   renderCharts(state);
