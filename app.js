@@ -476,7 +476,7 @@ function gainSeries(start, target) {
   return { previous, cumulative };
 }
 function gainChart(id, points, heading, description, insight, unit = "percent") {
-  if (!points.length) return '<article class="panel chart-card"><h2>' + t(heading) +
+  if (!points.length) return '<article class="panel chart-card'+(unit === "msu" ? ' efficiency-card' : '')+'"><h2>' + t(heading) +
     '</h2><p>' + t("Percentage gain is undefined from zero output") + '</p></article>';
   const w = 420, h = 290, left = 76, right = 22, top = 36, bottom = 54;
   const scale = unit === "msu" ? 1 : 100;
