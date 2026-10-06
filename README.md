@@ -95,3 +95,21 @@ GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks 
 Pages must first be enabled in **Settings → Pages → Build and deployment → Source: GitHub Actions**. The regular workflow `GITHUB_TOKEN` can deploy an enabled site but cannot perform its initial enablement. The previous failure at Configure Pages was caused by trying to enable the site using that token.
 
 Trade ratio settings live in a compact header menu (default Metal : Crystal : Deuterium = 3:2:1). The three charts are collapsed by default; use **Show charts** above the table to expand them, and **Hide charts** to collapse them again. Both controls support English/Russian and both designs.
+
+## Resource building calculator
+
+Open `resources.html`, or use **Resource bonuses** in the calculator navigation. Choose metal, crystal or deuterium, a planet count, and starting/target building levels. The page shares both languages, themes, editable MSU ratio, shareable URLs, cumulative upgrade tables and three collapsible charts with the IAS calculator.
+
+Community reference: [OGame Utilities — Orion](https://ogameutilities.it/Ogame-Orion/), inspected interactively on 6 October 2026. These figures have **not** been independently checked in the game. English/Russian building names are descriptive translations.
+
+| Resource building | Level 1 metal | Crystal | Deuterium | Unlock mission level |
+| --- | ---: | ---: | ---: | ---: |
+| Metal recycling line | 112,500 | 37,500 | 18,000 | 150 |
+| Crystal treatment | 37,500 | 67,500 | 27,000 | 200 |
+| High-pressure deuterium tanks | 30,000 | 37,500 | 45,000 | 300 |
+
+Each resource cost is `floor(base × 1.5^(L−1))`, then multiplied by planets. Exact rational arithmetic reproduces the reference's fractional rounding (e.g. crystal building level 4 = 126,562 / 227,812 / 91,125). The reference describes **+0.2 percentage points per level to the selected mission resource**, not mine production.
+
+The selectable additive stacking scenario uses `bonus = 0.002 × level × planets`. Turning it off uses one building's bonus while keeping the upgrade cost for all selected planets. **Cross-planet stacking is unverified** and prominently labeled as a model. Relative reward gain compares `(1 + target bonus) / (1 + starting bonus) − 1`; other reward modifiers, unlock mission costs, production, payback time, and absolute mission loot are excluded. Cost efficiency is upgrade MSU divided by the relative modeled gain in percentage points, not by the raw building bonus.
+
+Resource building levels are limited to 0–50 for numeric precision; this is a calculator range, not a claimed game cap. Unit tests cover resource costs, rounding, model switching and zero-start behavior; live browser checks cover all three resources, themes, languages and desktop/mobile layouts.

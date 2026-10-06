@@ -14,6 +14,16 @@
 }
 
 * { box-sizing: border-box; }
+.calculator-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.calculator-tabs a { color: var(--text); text-decoration: none; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; }
+.calculator-tabs a:hover { border-color: var(--accent); }
+.calculator-tabs a[aria-current="page"] { border-color: var(--accent); color: var(--accent); background: var(--panel); }
+.resource-model { padding: 14px 16px; margin-top: 16px; }
+.resource-model label { display: flex; gap: 10px; align-items: center; }
+.resource-model input { width: 18px; height: 18px; accent-color: var(--accent); }
+.resource-model p { margin: 8px 0; color: var(--muted); font-size: 13px; }
+.resource-model a { color: var(--accent); font-size: 13px; }
+.resource-controls select { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 6px; padding: 0 10px; background: var(--panel); color: var(--text); font: inherit; }
 html { background: var(--bg); }
 body {
   margin: 0;
@@ -427,6 +437,7 @@ html[data-theme="minimal"] .chart-grid-line { stroke: #e4e7ec; }
 
 /* Secondary settings and charts stay out of the main calculation flow. */
 .controls { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+.resource-controls { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
 .ratio-menu { position: relative; }
 .ratio-menu summary, .charts-panel summary { cursor: pointer; list-style: none; }
 .ratio-menu summary::-webkit-details-marker, .charts-panel summary::-webkit-details-marker { display: none; }

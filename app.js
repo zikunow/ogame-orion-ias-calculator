@@ -1,4 +1,5 @@
 const $ = (id) => document.getElementById(id);
+const resourceMode = document.body?.dataset?.calculator === "resources";
 
 const els = {
   planets: $("planets"),
@@ -273,6 +274,7 @@ function setTheme(next, persist = true) {
   const url = new URL(window.location.href);
   url.searchParams.set("theme", theme);
   window.history.replaceState({}, "", url);
+  syncNavigation(url);
 }
 function initialTheme() {
   const urlTheme = new URLSearchParams(window.location.search).get("theme");
@@ -280,7 +282,7 @@ function initialTheme() {
   try { return localStorage.getItem("ias-theme") === "cosmic" ? "cosmic" : "minimal"; } catch { return "minimal"; }
 }
 function t(text, values = {}) {
-  let translated = language === "ru" ? (russian[text] ?? text) : text;
+  let translated = resourceMode && resourceText[text] ? resourceText[text][language] : language === "ru" ? (russian[text] ?? text) : text;
   for (const [key, value] of Object.entries(values)) translated = translated.replaceAll("{" + key + "}", value);
   return translated;
 }
@@ -322,6 +324,7 @@ function initialLanguage() {
 }
 
 function costAtLevel(level) {
+  if (resourceMode) return resourceCostAtLevel(level, $("resourceSelect").value);
   if (level === 0) return { metal: 0, crystal: 0, deut: 0 };
   // Rational arithmetic avoids floating point errors at whole-unit boundaries.
   const numerator = 7n ** BigInt(level - 1);
@@ -333,6 +336,10 @@ function costAtLevel(level) {
 function lithiumPerPlanet(level) {
   if (level === 0) return 0;
   return Number(220n * BigInt(level) * 11n ** BigInt(level - 1) / (10n ** BigInt(level - 1)));
+}
+
+function outputAtLevel(level) {
+  return resourceMode ? resourceFactor(level) : lithiumPerPlanet(level);
 }
 
 function msu(resources, ratio) {
@@ -436,7 +443,18 @@ function updateUrl(state) {
   url.searchParams.set("mr", state.ratio.metal);
   url.searchParams.set("cr", state.ratio.crystal);
   url.searchParams.set("dr", state.ratio.deut);
+  syncNavigation(url);
   window.history.replaceState({}, "", url);
+}
+
+function syncNavigation(url = new URL(window.location.href)) {
+  document.querySelectorAll(".calculator-tabs a").forEach(link => {
+    const destination = new URL(link.getAttribute("href"), url);
+    for (const key of ["p", "mr", "cr", "dr", "lang", "theme"]) if (url.searchParams.has(key)) destination.searchParams.set(key, url.searchParams.get(key));
+    link.setAttribute("href", destination.href);
+    if (destination.pathname.endsWith("resources.html") === resourceMode) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
 }
 
 
@@ -451,9 +469,9 @@ Object.assign(russian, {
   "MSU / +1%": "МСУ / +1%"
 });
 function msuPerPercentAtLevel(level, planets, ratio) {
-  const before = lithiumPerPlanet(level - 1);
+  const before = outputAtLevel(level - 1);
   if (!before) return NaN;
-  const gain = lithiumPerPlanet(level) / before - 1;
+  const gain = outputAtLevel(level) / before - 1;
   return msu(scaleResources(costAtLevel(level), planets), ratio) / (gain * 100);
 }
 function efficiencySeries(state) {
@@ -470,13 +488,13 @@ function pointLabel(level, value, unit) {
     : t("Level {level}: +{gain}", {level, gain:fmtPct(value)});
 }
 function gainSeries(start, target) {
-  const baseline = lithiumPerPlanet(start);
+  const baseline = outputAtLevel(start);
   const previous = [], cumulative = [];
   for (let level = start; level <= target; level++) {
-    const output = lithiumPerPlanet(level);
+    const output = outputAtLevel(level);
     if (baseline) cumulative.push({ level, gain: output / baseline - 1 });
     if (level > start) {
-      const before = lithiumPerPlanet(level - 1);
+      const before = outputAtLevel(level - 1);
       if (before) previous.push({ level, gain: output / before - 1 });
     }
   }
@@ -538,6 +556,7 @@ function renderCharts(state) {
 }
 
 function render() {
+  if (resourceMode) return renderResources();
   const ratioValue = $("ratioValue");
   if (ratioValue) ratioValue.textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
   const state = readState();
@@ -641,10 +660,11 @@ els.copyLink.addEventListener("click", async () => {
 });
 
 loadFromUrl();
+Object.assign(staticTranslations, { navIas: {en: "IAS calculator", ru: "Калькулятор IAS"}, navResources: {en: "Resource bonuses", ru: "Ресурсные бонусы"} });
+russian["Calculators"] = "Калькуляторы";
+if (resourceMode) initializeResources();
 $("themeSelect").addEventListener("change", event => setTheme(event.target.value));
 setTheme(initialTheme(), false);
 $("langEn").addEventListener("click", () => setLanguage("en"));
 $("langRu").addEventListener("click", () => setLanguage("ru"));
 setLanguage(initialLanguage(), false);
-
-

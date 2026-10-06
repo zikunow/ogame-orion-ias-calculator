@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" data-theme="minimal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OGame Orion resource building upgrade costs and modeled mission resource bonuses.">
+  <title>OGame Orion Resource Bonus Calculator</title>
+  <link rel="stylesheet" href="styles.css?v=20261006-resources">
+</head>
+<body data-calculator="resources">
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow" data-i18n="s0">OGame · Project Orion</p>
+        <h1 data-i18n="s1">Interstellar Anomaly Scanner Calculator</h1>
+        <p class="lede" data-i18n="s2">Enter the number of planets to calculate the cost of upgrading the Interstellar Anomaly Scanner on every planet, total IAS, lithium production and the relative gain from each level.</p>
+      </div>
+      <nav class="header-actions" aria-label="Language and project links" data-i18n-aria="Language and project links"><div class="language-switch" role="group" aria-label="Language" data-i18n-aria="Language"><button id="langEn" type="button" aria-pressed="true">EN</button><button id="langRu" type="button" aria-pressed="false">RU</button></div><label class="theme-control"><span data-i18n="themeLabel">Design</span><select id="themeSelect" aria-label="Design" data-i18n-aria="Design"><option value="minimal" data-i18n="themeMinimal">Minimal</option><option value="cosmic" data-i18n="themeCosmic">Cosmic</option></select></label><details id="ratioMenu" class="ratio-menu"><summary><span data-i18n="ratioMenu">Trade ratio</span> <span id="ratioValue">3:2:1</span></summary><div class="ratio-popover">      <fieldset class="ratio">
+        <legend data-i18n="s6">MSU trade ratio</legend>
+        <div class="ratio-inputs">
+          <label><span data-i18n="s7">Metal</span><input id="ratioMetal" type="number" min="0.1" step="0.1" value="3"></label>
+          <span>:</span>
+          <label><span data-i18n="s8">Crystal</span><input id="ratioCrystal" type="number" min="0.1" step="0.1" value="2"></label>
+          <span>:</span>
+          <label><span data-i18n="s9">Deut</span><input id="ratioDeut" type="number" min="0.1" step="0.1" value="1"></label>
+        </div>
+      </fieldset><p data-i18n="ratioHelp">Metal : Crystal : Deuterium. Default: 3:2:1.</p></div></details><a class="github-link" href="https://github.com/zikunow/ogame-orion-ias-calculator" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+    </header>
+    <nav class="calculator-tabs" aria-label="Calculators" data-i18n-aria="Calculators"><a href="index.html" data-i18n="navIas">IAS calculator</a><a href="resources.html" data-i18n="navResources">Resource bonuses</a></nav>
+
+    <section class="panel controls resource-controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
+      <label><span data-i18n="resourceChoice">Resource</span><select id="resourceSelect"><option value="metal" data-i18n="s7">Metal</option><option value="crystal" data-i18n="s8">Crystal</option><option value="deut" data-i18n="s9">Deut</option></select></label>
+      <label>
+        <span data-i18n="s3">Number of planets</span>
+        <input id="planets" type="number" min="1" max="50" step="1" value="18">
+      </label>
+      <label>
+        <span data-i18n="s4">Starting IAS level</span>
+        <input id="fromLevel" type="number" min="0" max="49" step="1" value="0">
+      </label>
+      <label>
+        <span data-i18n="s5">Target IAS level</span>
+        <input id="toLevel" type="number" min="1" max="50" step="1" value="10">
+      </label>
+
+      <button id="copyLink" class="secondary" type="button" data-i18n="s10">Copy share link</button>
+    </section>
+
+    <p id="validation" class="validation" role="alert" hidden></p>
+
+    <section class="summary-grid" aria-label="Summary" data-i18n-aria="Summary">
+      <article class="stat">
+        <span data-i18n="s11">Upgrade cost</span>
+        <strong id="upgradeCost">—</strong>
+        <small id="upgradeCostExact">—</small>
+      </article>
+      <article class="stat">
+        <span data-i18n="s12">Lithium/hour</span>
+        <strong id="targetLithium">—</strong>
+        <small id="currentLithium">—</small>
+      </article>
+      <article class="stat">
+        <span data-i18n="s13">Output gain</span>
+        <strong id="outputGain">—</strong>
+        <small id="outputMultiplier">—</small>
+      </article>
+      <article class="stat">
+        <span data-i18n="s14">Total IAS</span>
+        <strong id="targetIas">—</strong>
+        <small id="currentIas">—</small>
+      </article>
+    </section>
+
+    <section class="resource-model panel"><label><input id="stackBonuses" type="checkbox" checked><span data-i18n="stackModel">Model: bonuses stack across planets</span></label><p data-i18n="sourceWarning">Community-sourced costs and +0.2 percentage points per level. Cross-planet stacking is an unverified model, not an in-game confirmation. Other reward modifiers are excluded.</p><p id="buildingInfo"></p><a href="https://ogameutilities.it/Ogame-Orion/" target="_blank" rel="noreferrer" data-i18n="sourceLink">Source: OGame Utilities ↗</a></section>
+    <p id="resourceTotals" class="resource-totals" aria-live="polite">—</p>
+    <details id="chartsPanel" class="charts-panel panel">
+      <summary><span class="charts-closed" data-i18n="showCharts">Show charts</span><span class="charts-open" data-i18n="hideCharts">Hide charts</span><span class="charts-caption" data-i18n="chartsCaption">Output gain and MSU per +1%</span></summary>
+      <section id="gainCharts" class="gain-charts" aria-label="Lithium output gain charts" data-i18n-aria="Lithium output gain charts"></section>
+    </details>
+    <section class="panel table-panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow" data-i18n="s15">Upgrade path</p>
+          <h2 id="tableTitle">Levels 55 → 60</h2>
+        </div>
+        <p data-i18n="s16">Each row means upgrading <strong>every selected planet</strong> to that IAS level.</p>
+      </div>
+
+      <p class="table-hint" data-i18n="s17">Scroll horizontally to compare every column. MSU / +1% uses each upgrade’s gain versus the previous level.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable upgrade results" data-i18n-aria="Scrollable upgrade results">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="level">Level</th>
+              <th data-i18n="s18">This level<br><span>all planets</span></th>
+              <th data-i18n="s19">Extra from start<br><span>MSU</span></th>
+              <th data-i18n="s20">Total invested<br><span>to this level</span></th>
+              <th data-i18n="s21">Total IAS</th>
+              <th data-i18n="s22">Lithium/hour<br><span>all planets</span></th>
+              <th data-i18n="s23">Gain vs prev.</th>
+              <th data-i18n="s24">Gain vs start</th>
+              <th data-i18n="s25">MSU / +1%</th>
+            </tr>
+          </thead>
+          <tbody id="results"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel formulas">
+      <div>
+        <p class="eyebrow" data-i18n="s26">Formulas used</p>
+        <h2 data-i18n="s27">How it is calculated</h2>
+      </div>
+      <div class="formula-grid">
+        <div>
+          <span data-i18n="s28">Level cost per planet</span>
+          <code data-i18n="s29">M/C/D = 84/42/14 × 1.4^(L−1)</code>
+          <small data-i18n="small0">Each resource is rounded to the nearest whole unit.</small>
+        </div>
+        <div>
+          <span data-i18n="s30">Lithium/hour per planet</span>
+          <code data-i18n="s31">floor(220 × L × 1.1^(L−1))</code>
+          <small data-i18n="small1">Matches observed in-game IAS values, including levels 20–34.</small>
+        </div>
+        <div>
+          <span data-i18n="s32">Default MSU (3:2:1)</span>
+          <code data-i18n="s33">MSU = Metal + 1.5 × Crystal + 3 × Deuterium</code>
+          <small data-i18n="small2">You can change the trade ratio above.</small>
+        </div>
+      </div>
+      <p class="note" data-i18n="s34">“Output gain” refers to lithium/hour only. The Orion loot formula is unconfirmed; these percentages are not confirmed loot gains. Percentage gains from IAS 0 are undefined and shown as N/A.</p>
+    </section>
+
+    <footer>
+      <span data-i18n="s35">Unofficial community calculator for OGame Project Orion.</span>
+      <span data-i18n="s36">Mechanics may change while Orion is being tested.</span>
+    </footer>
+  </main>
+
+  <noscript><p>This calculator requires JavaScript. Please enable it to see the results.</p></noscript>
+  <script src="resources.js?v=20261006-resources"></script>
+  <script src="app.js?v=20261006-resources"></script>
+</body>
+</html>
