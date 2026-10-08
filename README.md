@@ -35,22 +35,24 @@ These are output comparisons, not confirmed loot scaling or payback estimates.
 
 ## Calculation
 
-For level `L >= 1`, base resource costs are 84 Metal, 42 Crystal and 14 Deuterium:
+Updated for the [8 October 2026 Singularity 13.1.0-beta13 balance](https://board.en.ogame.gameforge.com/index.php?thread/856579-pts-version-13-0-0-singularity/&pageNo=2): IAS cost scaling increased from 1.4 to 1.5 and base lithium production decreased from 20 to 15.36 (−23.2%). The observed hourly coefficient therefore changes from 220 to 168.96 in the calculator’s existing production model. The changelog confirms the scaling and production changes; the 90/45/15 resource base is inferred from the supplied in-game screenshots.
+
+For level `L >= 1`, base resource costs used are 90 Metal, 45 Crystal and 15 Deuterium, matching the supplied level 38 and 40 screenshots:
 
 ```text
-resourceCost(L) = round(baseCost × 1.4^(L − 1))
+resourceCost(L) = round(baseCost × 1.5^(L − 1))
 upgradeCost(start, target) = sum(resourceCost(L), L = start + 1 … target)
 ```
 
-The calculator retains the original nearest-whole-unit resource rounding convention. Rounding occurs per resource per planet before multiplying by planet count. It uses exact rational arithmetic for the 1.4 multiplier to avoid floating point errors at rounding boundaries. No account-specific discounts or bonuses are applied.
+The calculator retains the original nearest-whole-unit resource rounding convention. Rounding occurs per resource per planet before multiplying by planet count. It uses exact rational arithmetic for the 1.5 multiplier to avoid floating point errors at rounding boundaries. No account-specific discounts or bonuses are applied.
 
 ```text
-lithium/hour(L) = floor(220 × L × 1.1^(L − 1))
+lithium/hour(L) = floor(168.96 × L × 1.1^(L − 1))
 total lithium/hour = lithium/hour(L) × planets
 total IAS = L × planets
 ```
 
-IAS 0 has zero cost and output. Exact rational arithmetic is also used before flooring lithium output. The supplied in-game checkpoints are 26,909 at level 20, 31,081 at 21, 35,817 at 22, 153,286 at 33 and 173,724 at 34.
+IAS 0 has zero cost and output. Exact rational arithmetic is also used before flooring lithium output. The supplied post-update in-game checkpoints include 193,251 at level 37, 246,473 at 39, 278,072 at 40 and 901,561 at 50; all 14 supplied levels from 37 through 50 match. Resource totals use BigInt to retain whole-unit accuracy across 50 planets through level 80; MSU and percentages use floating-point arithmetic and are approximate at very large totals.
 
 For a Metal:Crystal:Deuterium ratio `M:C:D`:
 
@@ -83,14 +85,14 @@ python3 -m http.server 8000
 Run the regression checks with Node.js 18 or later:
 
 ```sh
-node --test tests/calculator.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Checks cover supplied lithium values, cost scaling, cumulative totals, custom MSU ratios, the 55→60 example, invalid inputs and zero-output behavior.
 
 ## Deployment
 
-GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks and uploads only `index.html`, `styles.css`, `app.js` and `.nojekyll`, then deploys on pushes to `main` or manual dispatch.
+GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks and uploads only `index.html`, `resources.html`, `styles.css`, `app.js`, `resources.js` and `.nojekyll`, then deploys on pushes to `main` or manual dispatch.
 
 Pages must first be enabled in **Settings → Pages → Build and deployment → Source: GitHub Actions**. The regular workflow `GITHUB_TOKEN` can deploy an enabled site but cannot perform its initial enablement. The previous failure at Configure Pages was caused by trying to enable the site using that token.
 

@@ -58,11 +58,11 @@ const russian = {
   "Formulas used": "Формулы",
   "How it is calculated": "Как считается",
   "Level cost per planet": "Цена уровня на одной планете",
-  "M/C/D = 84/42/14 × 1.4^(L−1)": "М/К/Д = 84/42/14 × 1,4^(L−1)",
+  "M/C/D = 90/45/15 × 1.5^(L−1)": "М/К/Д = 90/45/15 × 1,5^(L−1)",
   "Each resource is rounded to the nearest whole unit.": "Каждый ресурс округляется до ближайшего целого числа.",
   "Lithium/hour per planet": "Литий в час на одной планете",
-  "floor(220 × L × 1.1^(L−1))": "⌊220 × L × 1,1^(L−1)⌋",
-  "Matches observed in-game IAS values, including levels 20–34.": "Совпадает с проверенными значениями в игре, включая уровни 20–34.",
+  "floor(168.96 × L × 1.1^(L−1))": "⌊168,96 × L × 1,1^(L−1)⌋",
+  "PTS balance: 8 October 2026. Matches observed lithium output at levels 37–50.": "Баланс PTS от 8 октября 2026. Совпадает с выработкой лития на уровнях 37–50.",
   "Default MSU (3:2:1)": "МСУ по умолчанию (3:2:1)",
   "MSU = Metal + 1.5 × Crystal + 3 × Deuterium": "МСУ = Металл + 1,5 × Кристалл + 3 × Дейтерий",
   "You can change the trade ratio above.": "Курс ресурсов можно изменить выше.",
@@ -216,16 +216,16 @@ const staticTranslations = {
     "ru": "Цена уровня на одной планете"
   },
   "s29": {
-    "en": "M/C/D = 84/42/14 × 1.4^(L−1)",
-    "ru": "М/К/Д = 84/42/14 × 1,4^(L−1)"
+    "en": "M/C/D = 90/45/15 × 1.5^(L−1)",
+    "ru": "М/К/Д = 90/45/15 × 1,5^(L−1)"
   },
   "s30": {
     "en": "Lithium/hour per planet",
     "ru": "Литий в час на одной планете"
   },
   "s31": {
-    "en": "floor(220 × L × 1.1^(L−1))",
-    "ru": "⌊220 × L × 1,1^(L−1)⌋"
+    "en": "floor(168.96 × L × 1.1^(L−1))",
+    "ru": "⌊168,96 × L × 1,1^(L−1)⌋"
   },
   "s32": {
     "en": "Default MSU (3:2:1)",
@@ -252,8 +252,8 @@ const staticTranslations = {
     "ru": "Каждый ресурс округляется до ближайшего целого числа."
   },
   "small1": {
-    "en": "Matches observed in-game IAS values, including levels 20–34.",
-    "ru": "Совпадает с проверенными значениями в игре, включая уровни 20–34."
+    "en": "PTS balance: 8 October 2026. Matches observed lithium output at levels 37–50.",
+    "ru": "Баланс PTS от 8 октября 2026. Совпадает с выработкой лития на уровнях 37–50."
   },
   "small2": {
     "en": "You can change the trade ratio above.",
@@ -327,15 +327,16 @@ function costAtLevel(level) {
   if (resourceMode) return resourceCostAtLevel(level, $("resourceSelect").value);
   if (level === 0) return { metal: 0, crystal: 0, deut: 0 };
   // Rational arithmetic avoids floating point errors at whole-unit boundaries.
-  const numerator = 7n ** BigInt(level - 1);
-  const denominator = 5n ** BigInt(level - 1);
+  const numerator = 3n ** BigInt(level - 1);
+  const denominator = 2n ** BigInt(level - 1);
   const rounded = (base) => Number((BigInt(base) * numerator * 2n + denominator) / (2n * denominator));
-  return { metal: rounded(84), crystal: rounded(42), deut: rounded(14) };
+  return { metal: rounded(90), crystal: rounded(45), deut: rounded(15) };
 }
 
 function lithiumPerPlanet(level) {
   if (level === 0) return 0;
-  return Number(220n * BigInt(level) * 11n ** BigInt(level - 1) / (10n ** BigInt(level - 1)));
+  // 168.96 = 4224/25; floor only after evaluating the complete expression.
+  return Number(4224n * BigInt(level) * 11n ** BigInt(level - 1) / (25n * 10n ** BigInt(level - 1)));
 }
 
 function outputAtLevel(level) {
@@ -343,11 +344,17 @@ function outputAtLevel(level) {
 }
 
 function msu(resources, ratio) {
-  return resources.metal + resources.crystal * (ratio.metal / ratio.crystal) +
-    resources.deut * (ratio.metal / ratio.deut);
+  return Number(resources.metal) + Number(resources.crystal) * (ratio.metal / ratio.crystal) +
+    Number(resources.deut) * (ratio.metal / ratio.deut);
 }
 
 function scaleResources(resources, multiplier) {
+  // IAS per-planet costs are safe integers through level 80; fleet-wide totals may exceed that range.
+  if (!resourceMode) return {
+    metal: BigInt(resources.metal) * BigInt(multiplier),
+    crystal: BigInt(resources.crystal) * BigInt(multiplier),
+    deut: BigInt(resources.deut) * BigInt(multiplier)
+  };
   return {
     metal: resources.metal * multiplier,
     crystal: resources.crystal * multiplier,
@@ -356,6 +363,11 @@ function scaleResources(resources, multiplier) {
 }
 
 function addResources(a, b) {
+  if (!resourceMode) return {
+    metal: BigInt(a.metal) + BigInt(b.metal),
+    crystal: BigInt(a.crystal) + BigInt(b.crystal),
+    deut: BigInt(a.deut) + BigInt(b.deut)
+  };
   return {
     metal: a.metal + b.metal,
     crystal: a.crystal + b.crystal,
