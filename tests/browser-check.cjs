@@ -41,6 +41,9 @@ const { chromium } = require('playwright');
         inputsFit: [...document.querySelectorAll('input')].every(el => {
           const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth;
         }),
+        outsideInputs: [...document.querySelectorAll('input')].map(el => {
+          const r = el.getBoundingClientRect(); return {id:el.id,left:r.left,right:r.right};
+        }).filter(r => r.left < 0 || r.right > innerWidth),
         tableScrollable: document.querySelector('.table-wrap').scrollWidth > document.querySelector('.table-wrap').clientWidth
       }));
       assert.ok(layout.document <= layout.viewport, JSON.stringify(layout));
