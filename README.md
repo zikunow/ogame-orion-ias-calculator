@@ -100,7 +100,9 @@ Trade ratio settings live in a compact header menu (default Metal : Crystal : De
 
 ## Resource building calculator
 
-Open `resources.html`, or use **Resource bonuses** in the calculator navigation. Choose metal, crystal or deuterium, a planet count, and starting/target building levels. The page shares both languages, themes, editable MSU ratio, shareable URLs, cumulative upgrade tables and three collapsible charts with the IAS calculator.
+Open `resources.html`, or use **Resource bonuses** in the calculator navigation. Choose metal, crystal, deuterium or lithium, and starting/target building levels. Use **Add technology** to compare up to 12 independently configured technologies; the planet count, MSU trade ratio and stacking model are shared. Each technology has its own summary, table, validation and three independently collapsible charts. Technologies can be removed, including the first one. Share links preserve all selections and ranges in `techs=metal:0:10,lithium:10:20`; legacy single-technology URLs remain supported.
+
+Lithium results show **percentage increases in lithium rewarded by anomalies**, not hourly IAS production and not MSU profit. MSU is used only for resource investment and the cost per +1% lithium reward gain. Changing the MSU ratio changes the investment, never the reward percentage. Different reward types are not combined into a single profit total. Both languages and designs apply to every technology panel.
 
 Community reference: [OGame Utilities — Orion](https://ogameutilities.it/Ogame-Orion/), inspected interactively on 6 October 2026. These figures have **not** been independently checked in the game. English/Russian building names are descriptive translations.
 
@@ -109,6 +111,9 @@ Community reference: [OGame Utilities — Orion](https://ogameutilities.it/Ogame
 | Metal recycling line | 112,500 | 37,500 | 18,000 | 150 |
 | Crystal treatment | 37,500 | 67,500 | 27,000 | 200 |
 | High-pressure deuterium tanks | 30,000 | 37,500 | 45,000 | 300 |
+| Lithium electrolysis laboratory | 52,500 | 37,500 | 37,500 | 100 |
+
+Lithium data was added from the same reference's published `engine.mjs?v=20261008`, inspected on 12 October 2026. It defines building 4002 with internal base 35,000 / 25,000 / 25,000 and a 1.5^L multiplier (equivalent to the level-1 costs above), unlock mission 100, and +0.2 percentage points per level to mission lithium, explicitly not hourly production. As with the other technologies, these are community-source figures, not independent in-game verification.
 
 Each resource cost is `floor(base × 1.5^(L−1))`, then multiplied by planets. Exact rational arithmetic reproduces the reference's fractional rounding (e.g. crystal building level 4 = 126,562 / 227,812 / 91,125). The reference describes **+0.2 percentage points per level to the selected mission resource**, not mine production.
 

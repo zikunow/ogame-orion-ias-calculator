@@ -1,4 +1,5 @@
-const $ = (id) => document.getElementById(id);
+let resourceRenderScope = null;
+const $ = (id) => resourceRenderScope?.querySelector(`[data-field="${id}"]`) || document.getElementById(id);
 const resourceMode = document.body?.dataset?.calculator === "resources";
 
 const els = {
@@ -544,6 +545,7 @@ function gainChart(id, points, heading, description, insight, unit = "percent") 
     svg+'<p class="chart-insight">'+insight+'</p><p id="'+id+'Readout" class="chart-readout" aria-live="polite">'+t(unit === "msu" ? "Select a point to see its exact cost." : "Select a point to see its exact gain.")+'</p></article>';
 }
 function renderCharts(state) {
+  const prefix = resourceRenderScope?.dataset.chartPrefix || "";
   const series = gainSeries(state.fromLevel, state.toLevel);
   const prev = series.previous;
   const efficiency = efficiencySeries(state);
@@ -552,12 +554,14 @@ function renderCharts(state) {
   const totalInsight = series.cumulative.length ? t("Total gain from level {start}: +{gain}", {start:state.fromLevel,gain:fmtPct(series.cumulative.at(-1).gain)}) : "";
   $("gainCharts").innerHTML =
     '<div class="chart-grid">' +
-    gainChart("stepChart",prev,"Gain vs previous level","Each point is the gain of that upgrade over the previous level.",prevInsight) +
-    gainChart("totalChart",series.cumulative,"Gain vs starting level","The starting level is 0%; each point compares output with that same starting level.",totalInsight) +
-    gainChart("efficiencyChart",efficiency,"MSU per +1% output","Upgrade MSU divided by its percentage gain versus the previous level. All selected planets; lower is cheaper.",efficiencyInsight,"msu") +
+    gainChart(prefix+"stepChart",prev,"Gain vs previous level","Each point is the gain of that upgrade over the previous level.",prevInsight) +
+    gainChart(prefix+"totalChart",series.cumulative,"Gain vs starting level","The starting level is 0%; each point compares output with that same starting level.",totalInsight) +
+    gainChart(prefix+"efficiencyChart",efficiency,"MSU per +1% output","Upgrade MSU divided by its percentage gain versus the previous level. All selected planets; lower is cheaper.",efficiencyInsight,"msu") +
     '</div><p class="chart-note">'+t("These charts show lithium output, not confirmed loot gains or payback. Y axes use separate linear scales starting at zero.")+'</p>';
-  document.querySelectorAll(".chart-point").forEach(point => {
-    const show = () => $(point.dataset.chart+"Readout").textContent = pointLabel(point.dataset.level, Number(point.dataset.gain), point.dataset.unit);
+  const chartContainer = $("gainCharts");
+  (chartContainer.querySelectorAll?.(".chart-point") || document.querySelectorAll(".chart-point")).forEach(point => {
+    const readout = document.getElementById(point.dataset.chart+"Readout");
+    const show = () => readout.textContent = pointLabel(point.dataset.level, Number(point.dataset.gain), point.dataset.unit);
     point.addEventListener("mouseenter", show);
     point.addEventListener("focus", show);
     point.addEventListener("click", show);

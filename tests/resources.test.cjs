@@ -19,8 +19,19 @@ test('matches OGame Utilities resource building checkpoints including floor roun
   for(const [type,level,expected] of [
     ['metal',1,[112500,37500,18000]],['metal',2,[168750,56250,27000]],['metal',3,[253125,84375,40500]],
     ['crystal',1,[37500,67500,27000]],['crystal',4,[126562,227812,91125]],
-    ['deut',1,[30000,37500,45000]],['deut',4,[101250,126562,151875]]
+    ['deut',1,[30000,37500,45000]],['deut',4,[101250,126562,151875]],
+    ['lithium',1,[52500,37500,37500]],['lithium',2,[78750,56250,56250]],['lithium',4,[177187,126562,126562]]
   ]) assert.equal(c.run('JSON.stringify(Object.values(resourceCostAtLevel('+level+',"'+type+'")))'),JSON.stringify(expected));
+});
+test('lithium gain is a percentage of anomaly rewards, not MSU or hourly production',()=>{
+  const c=calculator();
+  c.elements.resourceSelect.value='lithium';
+  c.elements.fromLevel.value='10';c.elements.toLevel.value='20';c.run('render()');
+  assert.equal(c.elements.outputGain.textContent,'+26.47%');
+  assert.equal(c.elements.currentIas.textContent,'36 pp → 72 pp');
+  assert.equal(c.run('resourceBuildings.lithium.unlock'),100);
+  c.elements.stackBonuses.checked=false;c.run('render()');
+  assert.equal(c.elements.outputGain.textContent,'+1.96%');
 });
 test('resource model and costs respond independently to stacking and planets',()=>{
   const c=calculator();

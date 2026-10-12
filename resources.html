@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="OGame Orion resource building upgrade costs and modeled mission resource bonuses.">
   <title>OGame Orion Resource Bonus Calculator</title>
-  <link rel="stylesheet" href="styles.css?v=20261006-resources">
+  <link rel="stylesheet" href="styles.css?v=20261012-technologies">
 </head>
 <body data-calculator="resources">
   <main class="shell">
@@ -28,12 +28,21 @@
     </header>
     <nav class="calculator-tabs" aria-label="Calculators" data-i18n-aria="Calculators"><a href="index.html" data-i18n="navIas">IAS calculator</a><a href="resources.html" data-i18n="navResources">Resource bonuses</a></nav>
 
-    <section class="panel controls resource-controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
-      <label><span data-i18n="resourceChoice">Resource</span><select id="resourceSelect"><option value="metal" data-i18n="s7">Metal</option><option value="crystal" data-i18n="s8">Crystal</option><option value="deut" data-i18n="s9">Deut</option></select></label>
+    <section class="panel controls shared-tech-controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
       <label>
         <span data-i18n="s3">Number of planets</span>
         <input id="planets" type="number" min="1" max="50" step="1" value="18">
       </label>
+      <p data-i18n="sharedPlanets">Planet count applies to every technology below.</p>
+      <button id="addTechnology" class="secondary" type="button" data-i18n="addTechnology">+ Add technology</button>
+      <button id="copyLink" class="secondary" type="button" data-i18n="s10">Copy share link</button>
+    </section>
+    <section class="resource-model panel"><label><input id="stackBonuses" type="checkbox" checked><span data-i18n="stackModel">Model: bonuses stack across planets</span></label><p data-i18n="sourceWarning">Community-sourced costs and +0.2 percentage points per level. Cross-planet stacking is an unverified model, not an in-game confirmation. Other reward modifiers are excluded.</p><a href="https://ogameutilities.it/Ogame-Orion/" target="_blank" rel="noreferrer" data-i18n="sourceLink">Source: OGame Utilities ↗</a></section>
+    <div id="technologyList">
+    <section class="technology-block" data-chart-prefix="">
+    <div class="section-head technology-heading"><h2 data-field="technologyTitle">Technology</h2><button type="button" class="secondary remove-technology" data-i18n="removeTechnology" disabled>Remove</button></div>
+    <section class="panel controls resource-controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
+      <label><span data-i18n="resourceChoice">Resource</span><select id="resourceSelect"><option value="metal" data-i18n="s7">Metal</option><option value="crystal" data-i18n="s8">Crystal</option><option value="deut" data-i18n="s9">Deut</option><option value="lithium" data-i18n="lithiumChoice">Lithium</option></select></label>
       <label>
         <span data-i18n="s4">Starting IAS level</span>
         <input id="fromLevel" type="number" min="0" max="49" step="1" value="0">
@@ -43,7 +52,6 @@
         <input id="toLevel" type="number" min="1" max="50" step="1" value="10">
       </label>
 
-      <button id="copyLink" class="secondary" type="button" data-i18n="s10">Copy share link</button>
     </section>
 
     <p id="validation" class="validation" role="alert" hidden></p>
@@ -71,7 +79,7 @@
       </article>
     </section>
 
-    <section class="resource-model panel"><label><input id="stackBonuses" type="checkbox" checked><span data-i18n="stackModel">Model: bonuses stack across planets</span></label><p data-i18n="sourceWarning">Community-sourced costs and +0.2 percentage points per level. Cross-planet stacking is an unverified model, not an in-game confirmation. Other reward modifiers are excluded.</p><p id="buildingInfo"></p><a href="https://ogameutilities.it/Ogame-Orion/" target="_blank" rel="noreferrer" data-i18n="sourceLink">Source: OGame Utilities ↗</a></section>
+    <p id="buildingInfo" class="building-info"></p>
     <p id="resourceTotals" class="resource-totals" aria-live="polite">—</p>
     <details id="chartsPanel" class="charts-panel panel">
       <summary><span class="charts-closed" data-i18n="showCharts">Show charts</span><span class="charts-open" data-i18n="hideCharts">Hide charts</span><span class="charts-caption" data-i18n="chartsCaption">Output gain and MSU per +1%</span></summary>
@@ -107,6 +115,8 @@
       </div>
     </section>
 
+    </section>
+    </div>
     <section class="panel formulas">
       <div>
         <p class="eyebrow" data-i18n="s26">Formulas used</p>
@@ -139,7 +149,7 @@
   </main>
 
   <noscript><p>This calculator requires JavaScript. Please enable it to see the results.</p></noscript>
-  <script src="resources.js?v=20261006-resources2"></script>
-  <script src="app.js?v=20261008-beta13"></script>
+  <script src="resources.js?v=20261012-technologies"></script>
+  <script src="app.js?v=20261012-technologies"></script>
 </body>
 </html>
