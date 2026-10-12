@@ -15,8 +15,8 @@ const resourceText = {
   "Upgrade MSU divided by its percentage gain versus the previous level. All selected planets; lower is cheaper.": {en: "Upgrade MSU divided by the modeled reward gain versus the previous level. All selected planets; lower is cheaper.", ru: "Стоимость улучшения в МСУ, делённая на прирост награды по модели к предыдущему уровню. Для всех выбранных планет; ниже — дешевле."},
   "The starting level is 0%; each point compares output with that same starting level.": {en: "Each point compares modeled rewards with the selected starting level; the baseline point is 0%.", ru: "Каждая точка сравнивает награду по модели с выбранным начальным уровнем; в начальной точке прирост 0%."},
   "These charts show lithium output, not confirmed loot gains or payback. Y axes use separate linear scales starting at zero.": {
-    en: "Reward gains follow the selected model (base reward × (1 + bonus)). Stacking across planets is unverified. Other modifiers are excluded; this is not a payback forecast.",
-    ru: "Прирост рассчитан по выбранной модели: базовая награда × (1 + бонус). Сложение между планетами не подтверждено. Другие модификаторы исключены; это не прогноз окупаемости."
+    en: "Bonuses from all selected planets are added: 0.2 percentage points × level × planets. Relative gains compare base reward × (1 + bonus). Other modifiers are excluded; this is not a payback forecast.",
+    ru: "Бонусы всех выбранных планет складываются: 0,2 процентного пункта × уровень × планеты. Относительный прирост сравнивает базовую награду × (1 + бонус). Другие модификаторы исключены; это не прогноз окупаемости."
   },
   "Starting IAS level must be an integer from 0 to 79.": {en: "Starting building level must be an integer from 0 to 49.", ru: "Начальный уровень подздания должен быть целым числом от 0 до 49."},
   "Target IAS level must be an integer from 1 to 80.": {en: "Target building level must be an integer from 1 to 50.", ru: "Целевой уровень подздания должен быть целым числом от 1 до 50."},
@@ -30,8 +30,7 @@ function resourceCostAtLevel(level, type) {
 }
 function resourceFactor(level) {
   const planets = Number($("planets").value);
-  const contributing = $("stackBonuses").checked ? planets : 1;
-  return 1 + 0.002 * level * contributing;
+  return 1 + 0.002 * level * planets;
 }
 function initializeResources() {
   const pairs = {
@@ -40,37 +39,33 @@ function initializeResources() {
     s4: ["Starting building level", "Начальный уровень подздания"],
     s5: ["Target building level", "Целевой уровень подздания"],
     s12: ["Bonus per building", "Бонус одного подздания"],
-    s13: ["Modeled reward gain", "Прирост награды по модели"],
-    s14: ["Selected bonus model", "Выбранная модель бонуса"],
+    s13: ["Reward gain", "Прирост награды"],
+    s14: ["Total reward bonus", "Суммарный бонус награды"],
     s16: ["Each row upgrades the selected resource building on <strong>every selected planet</strong>.", "Каждая строка — улучшение выбранного ресурсного подздания <strong>на всех выбранных планетах</strong>."],
     s17: ["Scroll horizontally. Bonus is shown in percentage points (pp); relative reward gains use the selected model.", "Прокрутите таблицу по горизонтали. Бонус указан в процентных пунктах (п.п.); относительный прирост награды рассчитан по выбранной модели."],
     s21: ["Total building levels", "Суммарные уровни"],
-    s22: ["Modeled bonus<br><span>percentage points</span>", "Бонус по модели<br><span>процентные пункты</span>"],
+    s22: ["Total bonus<br><span>percentage points</span>", "Суммарный бонус<br><span>процентные пункты</span>"],
     s28: ["Level cost per planet", "Стоимость уровня на одной планете"],
     s29: ["floor(Base resource cost × 1.5^(L−1))", "⌊Базовая стоимость ресурса × 1,5^(L−1)⌋"],
     small0: ["Each resource is floored separately, matching the reference calculator.", "Каждый ресурс округляется вниз отдельно, как в справочном калькуляторе."],
     s30: ["Bonus per building", "Бонус одного подздания"],
     s31: ["0.2 percentage points × L", "0,2 процентного пункта × L"],
     small1: ["Applies to the selected resource from missions, not mine production.", "Относится к выбранному ресурсу из миссий, не к выработке шахт."],
-    s34: ["Costs and unlocks come from a community calculator, not independently verified game data. Additive cross-planet stacking is a selectable, unverified scenario. This calculator excludes unlock mission costs and other reward modifiers. Levels 0–50 are a calculator range, not a confirmed game cap. Building names are descriptive translations.", "Цены и условия открытия взяты из калькулятора сообщества, а не независимо проверены в игре. Сложение бонусов между планетами — переключаемый неподтверждённый сценарий. Затраты на миссии открытия и другие бонусы не учитываются. Диапазон 0–50 — ограничение калькулятора, не подтверждённый игровой максимум. Названия подзданий — описательный перевод."],
+    s34: ["Costs and unlocks come from a community calculator, not independently verified game data. This calculator excludes unlock mission costs and other reward modifiers. Levels 0–50 are a calculator range, not a confirmed game cap. Building names are descriptive translations.", "Цены и условия открытия взяты из калькулятора сообщества, а не независимо проверены в игре. Затраты на миссии открытия и другие бонусы не учитываются. Диапазон 0–50 — ограничение калькулятора, не подтверждённый игровой максимум. Названия подзданий — описательный перевод."],
     resourceChoice: ["Resource", "Ресурс"],
     lithiumChoice: ["Lithium", "Литий"],
     sharedPlanets: ["Planet count applies to every technology below.", "Количество планет применяется ко всем технологиям ниже."],
     addTechnology: ["+ Add technology", "+ Добавить технологию"],
     removeTechnology: ["Remove", "Удалить"],
-    stackModel: ["Model: bonuses stack across planets", "Модель: бонусы складываются между планетами"],
-    sourceWarning: ["Costs and +0.2 pp per level are from a community reference. Cross-planet stacking is unverified. Disable the model to use one building's bonus while keeping upgrade costs for all planets.", "Цены и +0,2 п.п. за уровень — из справочника сообщества. Сложение между планетами не подтверждено. Отключите модель, чтобы использовать бонус одного подздания, сохранив затраты на все планеты."],
     sourceLink: ["Source: OGame Utilities ↗", "Источник: OGame Utilities ↗"],
     showCharts: ["Show charts", "Показать графики"],
     hideCharts: ["Hide charts", "Скрыть графики"],
-    chartsCaption: ["Modeled reward gain and cost efficiency", "Прирост награды по модели и эффективность затрат"]
+    chartsCaption: ["Reward gain and cost efficiency", "Прирост награды и эффективность затрат"]
   };
   for (const [key, [en, ru]] of Object.entries(pairs)) staticTranslations[key] = { en, ru };
   const params = new URLSearchParams(window.location.search);
   if (resourceBuildings[params.get("resource")]) $("resourceSelect").value = params.get("resource");
-  $("stackBonuses").checked = params.get("stack") !== "0";
   $("resourceSelect").addEventListener("change", render);
-  $("stackBonuses").addEventListener("change", render);
   initializeTechnologyPlanner(params);
 }
 function renderSingleResource() {
@@ -91,7 +86,7 @@ function renderSingleResource() {
     updateUrl(state);
     const url = new URL(window.location.href);
     url.searchParams.set("resource", $("resourceSelect").value);
-    url.searchParams.set("stack", $("stackBonuses").checked ? "1" : "0");
+    url.searchParams.delete("stack");
     window.history.replaceState({}, "", url);
   }
   const building = resourceBuildings[$("resourceSelect").value];
@@ -220,7 +215,7 @@ function renderResources() {
   const plans = readTechnologyPlans();
   const url = new URL(window.location.href);
   url.searchParams.set("resource", plans[0].type);
-  url.searchParams.set("stack", $("stackBonuses").checked ? "1" : "0");
+  url.searchParams.delete("stack");
   if (plans.length > 1) url.searchParams.set("techs", plans.map(p => `${p.type}:${p.from}:${p.to}`).join(","));
   else url.searchParams.delete("techs");
   window.history.replaceState({}, "", url);

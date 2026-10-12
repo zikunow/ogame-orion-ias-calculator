@@ -17,9 +17,11 @@ const {chromium} = require('playwright');
       await page.locator('[data-chart="efficiencyChart"]').last().click();
       assert.match(await page.locator('#efficiencyChartReadout').textContent(),/MSU/);
       await page.locator('#chartsPanel > summary').click();
-      await page.locator('#stackBonuses').uncheck();
-      assert.equal(await page.locator('#outputGain').textContent(),'+2.00%');
-      await page.locator('#stackBonuses').check();
+      assert.equal(await page.locator('#stackBonuses').count(),0);
+      assert.equal(await page.locator('.resource-model').count(),0);
+      await page.goto('https://zikunow.github.io/ogame-orion-ias-calculator/resources.html?lang=en&stack=0');
+      assert.equal(await page.locator('#outputGain').textContent(),'+36.00%');
+      assert.equal(new URL(page.url()).searchParams.has('stack'),false);
       await page.locator('#toLevel').fill('1');
       for(const [resource,cost] of [['metal','4,009,500'],['crystal','3,955,500'],['deut','3,982,500']]){
         await page.locator('#resourceSelect').selectOption(resource);
@@ -39,7 +41,7 @@ const {chromium} = require('playwright');
       }
       await page.reload();
       assert.equal(await page.locator('#resourceSelect').inputValue(),'deut');
-      assert.equal(await page.locator('#stackBonuses').isChecked(),true);
+      assert.equal(await page.locator('#stackBonuses').count(),0);
       await page.locator('#fromLevel').fill('0');await page.locator('#toLevel').fill('10');
       await page.locator('#addTechnology').click();
       assert.equal(await page.locator('.technology-block').count(),2);

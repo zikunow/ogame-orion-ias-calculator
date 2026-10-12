@@ -30,19 +30,21 @@ test('lithium gain is a percentage of anomaly rewards, not MSU or hourly product
   assert.equal(c.elements.outputGain.textContent,'+26.47%');
   assert.equal(c.elements.currentIas.textContent,'36 pp → 72 pp');
   assert.equal(c.run('resourceBuildings.lithium.unlock'),100);
-  c.elements.stackBonuses.checked=false;c.run('render()');
+  c.elements.planets.value='1';c.run('render()');
   assert.equal(c.elements.outputGain.textContent,'+1.96%');
 });
-test('resource model and costs respond independently to stacking and planets',()=>{
+test('reward bonuses and costs always scale across every selected planet',()=>{
   const c=calculator();
   assert.equal(c.elements.targetLithium.textContent,'+2 pp');
   assert.equal(c.elements.targetIas.textContent,'+36 pp');
   assert.equal(c.elements.outputGain.textContent,'+36.00%');
   assert.equal((c.elements.results.innerHTML.match(/<tr>/g)||[]).length,10);
   const cost=c.elements.upgradeCostExact.textContent;
-  c.elements.stackBonuses.checked=false;c.run('render()');
-  assert.equal(c.elements.outputGain.textContent,'+2.00%');
+  c.run('window.location.search="?stack=0"; window.location.href="https://example.com/resources.html?stack=0"; initializeResources(); render()');
+  assert.equal(c.elements.outputGain.textContent,'+36.00%');
   assert.equal(c.elements.upgradeCostExact.textContent,cost);
+  c.elements.planets.value='1';c.run('render()');
+  assert.equal(c.elements.outputGain.textContent,'+2.00%');
   assert.equal(c.run('gainSeries(0,10).cumulative.length'),11);
   c.elements.fromLevel.value='';c.run('render()');assert.equal(c.elements.copyLink.disabled,true);
   c.elements.fromLevel.value='0';c.elements.toLevel.value='51';c.run('render()');assert.equal(c.elements.copyLink.disabled,true);
