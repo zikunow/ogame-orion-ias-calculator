@@ -441,6 +441,17 @@ html[data-theme="minimal"] .chart-grid-line { stroke: #e4e7ec; }
 .shared-tech-controls { grid-template-columns: minmax(140px, 1fr) minmax(160px, 2fr) auto auto; align-items: end; }
 .shared-tech-controls p { color: var(--muted); margin: 0; align-self: center; }
 .technology-block { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+body[data-calculator="resources"] [hidden] { display: none !important; }
+.technology-table { margin-top: 12px; }
+.technology-table > summary { padding: 16px 20px; cursor: pointer; font-weight: 600; }
+.technology-table .table-open { display: none; }
+.technology-table[open] .table-open { display: inline; }
+.technology-table[open] .table-closed { display: none; }
+.combined-summary { margin-top: 28px; padding: 22px; }
+.combined-summary h2 { margin: 0 0 18px; }
+.combined-summary .summary-grid { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+.combined-gain { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 8px 0; }
+.combined-gain strong { font-size: 22px; }
 .technology-heading { gap: 12px; margin-bottom: 18px; }
 .technology-heading h2 { font-size: 20px; margin: 0; }
 .technology-heading .remove-technology { flex-shrink: 0; }

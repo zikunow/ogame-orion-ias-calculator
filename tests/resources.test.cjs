@@ -33,6 +33,15 @@ test('lithium gain is a percentage of anomaly rewards, not MSU or hourly product
   c.elements.planets.value='1';c.run('render()');
   assert.equal(c.elements.outputGain.textContent,'+1.96%');
 });
+test('combined costs include lithium while reward percentages remain separate',()=>{
+  const c=calculator();
+  const plans='[{type:"metal",from:0,to:1},{type:"lithium",from:0,to:1}]';
+  assert.equal(c.run('msu(combinedTechnologyTotals('+plans+',18).resources,{metal:3,crystal:2,deut:1})'),7992000);
+  assert.equal(c.run('combinedTechnologyTotals('+plans+',18).resources.metal'),2970000n);
+  assert.ok(Math.abs(c.run('combinedTechnologyTotals('+plans+',18).gains.lithium')-.036)<1e-12);
+  assert.equal(c.run('Object.keys(combinedTechnologyTotals('+plans+',18).gains).join(",")'),'metal,lithium');
+  assert.equal(c.run('msu(combinedTechnologyTotals('+plans+',9).resources,{metal:1,crystal:1,deut:1})'),2659500);
+});
 test('reward bonuses and costs always scale across every selected planet',()=>{
   const c=calculator();
   assert.equal(c.elements.targetLithium.textContent,'+2 pp');

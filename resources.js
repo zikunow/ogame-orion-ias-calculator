@@ -57,6 +57,14 @@ function initializeResources() {
     sharedPlanets: ["Planet count applies to every technology below.", "Количество планет применяется ко всем технологиям ниже."],
     addTechnology: ["+ Add technology", "+ Добавить технологию"],
     removeTechnology: ["Remove", "Удалить"],
+    showTable: ["Show upgrade table", "Показать таблицу улучшений"],
+    hideTable: ["Hide upgrade table", "Скрыть таблицу улучшений"],
+    combinedHeading: ["All selected technologies", "Итог по всем технологиям"],
+    combinedCostLabel: ["Total upgrade cost", "Общая стоимость улучшений"],
+    combinedResourcesLabel: ["Resource reward gains", "Прирост ресурсных наград"],
+    combinedResourcesHelp: ["Each percentage applies to its resource; different resource percentages are not added together.", "Каждый процент относится к своему ресурсу; проценты разных ресурсов не складываются."],
+    combinedLithiumLabel: ["Lithium reward gain", "Прирост лития в награде"],
+    combinedLithiumHelp: ["Lithium is shown separately; its upgrade cost is included in the total MSU.", "Литий показан отдельно; стоимость его улучшений включена в общие МСУ."],
     sourceLink: ["Source: OGame Utilities ↗", "Источник: OGame Utilities ↗"],
     showCharts: ["Show charts", "Показать графики"],
     hideCharts: ["Hide charts", "Скрыть графики"],
@@ -70,7 +78,8 @@ function initializeResources() {
 }
 function renderSingleResource() {
   const state = readState();
-  const error = validate(state) || (state.fromLevel > 49 || state.toLevel > 50 ? (language === "ru" ? "Диапазон калькулятора: начальный уровень 0–49, целевой 1–50." : "Calculator range: starting level 0–49, target level 1–50.") : "");
+  const duplicate = resourceRenderScope && technologyPanels.some(panel => panel !== resourceRenderScope && panel.querySelector('[data-field="resourceSelect"]').value === $("resourceSelect").value);
+  const error = validate(state) || (state.fromLevel > 49 || state.toLevel > 50 ? (language === "ru" ? "Диапазон калькулятора: начальный уровень 0–49, целевой 1–50." : "Calculator range: starting level 0–49, target level 1–50.") : "") || (duplicate ? (language === "ru" ? "Эта технология уже добавлена. Выберите другую." : "This technology is already added. Choose a different one.") : "");
   $("ratioValue").textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
   els.validation.hidden = !error;
   els.validation.textContent = error;
@@ -139,19 +148,24 @@ function initializeTechnologyPlanner(params) {
   const first = list.querySelector(".technology-block");
   first.querySelectorAll("[id]").forEach(el => { el.dataset.field = el.id; });
   technologyTemplate = first.cloneNode(true);
-  technologyPanels = [first];
   let plans = [];
   const encoded = params.get("techs");
-  if (encoded) plans = encoded.split(",").slice(0, 12).map(entry => {
+  if (encoded) plans = encoded.split(",").slice(0, 4).map(entry => {
     const [type, from, to] = entry.split(":");
     return { type, from, to };
   }).filter(plan => resourceBuildings[plan.type]);
-  if (plans.length) buildTechnologyPanels(plans);
+  if (!params.has("techs") && ["resource", "from", "to"].some(key => params.has(key))) plans = [{
+    type: resourceBuildings[params.get("resource")] ? params.get("resource") : "metal",
+    from: $("fromLevel").value,
+    to: $("toLevel").value
+  }];
+  buildTechnologyPanels(plans);
+  list.hidden = false;
   list.addEventListener("input", render);
   list.addEventListener("change", render);
   list.addEventListener("click", event => {
     const button = event.target.closest(".remove-technology");
-    if (!button || technologyPanels.length === 1) return;
+    if (!button) return;
     const index = technologyPanels.indexOf(button.closest(".technology-block"));
     const plans = readTechnologyPlans();
     plans.splice(index, 1);
@@ -159,9 +173,9 @@ function initializeTechnologyPlanner(params) {
     setLanguage(language, false);
   });
   document.getElementById("addTechnology").addEventListener("click", () => {
-    if (technologyPanels.length >= 12) return;
-    const plans = readTechnologyPlans();
-    const type = ["lithium", "metal", "crystal", "deut"].find(key => !plans.some(p => p.type === key)) || "metal";
+    if (technologyPanels.length >= 4) return;
+    const plans = readTechnologyPlans().map(plan => ({ ...plan, open: false, tableOpen: false }));
+    const type = ["metal", "crystal", "deut", "lithium"].find(key => !plans.some(p => p.type === key));
     plans.push({ type, from: "0", to: "10" });
     buildTechnologyPanels(plans);
     setLanguage(language, false);
@@ -173,7 +187,8 @@ function readTechnologyPlans() {
     type: panel.querySelector('[data-field="resourceSelect"]').value,
     from: panel.querySelector('[data-field="fromLevel"]').value,
     to: panel.querySelector('[data-field="toLevel"]').value,
-    open: panel.querySelector('[data-field="chartsPanel"]').open
+    open: panel.querySelector('[data-field="chartsPanel"]').open,
+    tableOpen: panel.querySelector('[data-field="tablePanel"]').open
   }));
 }
 function buildTechnologyPanels(plans) {
@@ -187,7 +202,8 @@ function buildTechnologyPanels(plans) {
     panel.querySelector('[data-field="fromLevel"]').value = plan.from;
     panel.querySelector('[data-field="toLevel"]').value = plan.to;
     panel.querySelector('[data-field="chartsPanel"]').open = Boolean(plan.open);
-    panel.querySelector(".remove-technology").disabled = plans.length === 1;
+    panel.querySelector('[data-field="tablePanel"]').open = Boolean(plan.tableOpen);
+    panel.querySelector(".remove-technology").disabled = false;
     list.append(panel);
     return panel;
   });
@@ -195,28 +211,73 @@ function buildTechnologyPanels(plans) {
 }
 function renderResources() {
   if (!technologyTemplate) return renderSingleResource();
+  const plans = readTechnologyPlans();
+  const globalState = { planets: inputNumber(els.planets), fromLevel: 0, toLevel: 1, ratio: {
+    metal: inputNumber(els.ratioMetal), crystal: inputNumber(els.ratioCrystal), deut: inputNumber(els.ratioDeut)
+  } };
+  const globalError = validate(globalState);
+  $("globalValidation").hidden = !globalError;
+  $("globalValidation").textContent = globalError;
+  $("ratioValue").textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
+  for (const id of ["technologyHelp", "technologyFooter", "combinedSummary"]) $(id).hidden = !plans.length;
   const saved = Object.fromEntries(scopedResourceFields.map(key => [key, els[key]]));
-  let valid = true;
+  let valid = !globalError;
   try {
     for (const panel of technologyPanels) {
       resourceRenderScope = panel;
       for (const key of scopedResourceFields) els[key] = $(key);
       valid = Boolean(renderSingleResource()) && valid;
+      panel.querySelector('[data-field="resourceSelect"]').querySelectorAll("option").forEach(option => {
+        option.disabled = plans.some(plan => plan.type === option.value && plan.type !== $("resourceSelect").value);
+      });
     }
   } finally {
     resourceRenderScope = null;
     Object.assign(els, saved);
   }
   els.copyLink.disabled = !valid;
-  document.getElementById("addTechnology").disabled = technologyPanels.length >= 12;
+  document.getElementById("addTechnology").disabled = technologyPanels.length >= 4;
+  renderCombinedSummary(plans, globalState, valid);
   if (!valid) return;
-  const state = readState();
-  updateUrl(state);
-  const plans = readTechnologyPlans();
+  updateUrl(plans.length ? readState() : globalState);
   const url = new URL(window.location.href);
-  url.searchParams.set("resource", plans[0].type);
+  if (plans.length) url.searchParams.set("resource", plans[0].type);
+  else for (const key of ["resource", "from", "to"]) url.searchParams.delete(key);
   url.searchParams.delete("stack");
   if (plans.length > 1) url.searchParams.set("techs", plans.map(p => `${p.type}:${p.from}:${p.to}`).join(","));
   else url.searchParams.delete("techs");
   window.history.replaceState({}, "", url);
+}
+
+function combinedTechnologyTotals(plans, planets) {
+  const resources = { metal: 0n, crystal: 0n, deut: 0n };
+  const gains = {};
+  for (const plan of plans) {
+    for (let level = Number(plan.from) + 1; level <= Number(plan.to); level++) {
+      const cost = resourceCostAtLevel(level, plan.type);
+      for (const key of Object.keys(resources)) resources[key] += BigInt(cost[key]) * BigInt(planets);
+    }
+    gains[plan.type] = (1 + .002 * Number(plan.to) * planets) / (1 + .002 * Number(plan.from) * planets) - 1;
+  }
+  return { resources, gains };
+}
+function renderCombinedSummary(plans, state, valid) {
+  $("combinedValidation").hidden = valid;
+  $("combinedValidation").textContent = language === "ru" ? "Исправьте параметры, чтобы увидеть общий итог." : "Correct the inputs to see the combined totals.";
+  $("combinedResourcesCard").hidden = !plans.some(plan => plan.type !== "lithium");
+  $("combinedLithiumCard").hidden = !plans.some(plan => plan.type === "lithium");
+  if (!valid || !plans.length) {
+    $("combinedCost").textContent = "—";
+    $("combinedCostExact").textContent = "—";
+    $("combinedResourceGains").textContent = "—";
+    $("combinedLithiumGain").textContent = "—";
+    return;
+  }
+  const { resources, gains } = combinedTechnologyTotals(plans, state.planets);
+  const cost = msu(resources, state.ratio);
+  $("combinedCost").textContent = fmtCompact(cost) + " " + t("MSU");
+  $("combinedCostExact").textContent = fmt(cost) + " " + t("MSU") + " · " + t("Metal") + " " + fmt(resources.metal) + " · " + t("Crystal") + " " + fmt(resources.crystal) + " · " + t("Deuterium") + " " + fmt(resources.deut);
+  const names = { metal: t("Metal"), crystal: t("Crystal"), deut: t("Deuterium") };
+  $("combinedResourceGains").innerHTML = ["metal", "crystal", "deut"].filter(type => type in gains).map(type => '<p class="combined-gain"><span>' + names[type] + '</span><strong>+' + fmtPct(gains[type]) + '</strong></p>').join("");
+  $("combinedLithiumGain").textContent = "lithium" in gains ? "+" + fmtPct(gains.lithium) : "—";
 }

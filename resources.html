@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="OGame Orion resource building upgrade costs and modeled mission resource bonuses.">
   <title>OGame Orion Resource Bonus Calculator</title>
-  <link rel="stylesheet" href="styles.css?v=20261012-technologies">
+  <link rel="stylesheet" href="styles.css?v=20261012-compact">
 </head>
 <body data-calculator="resources">
   <main class="shell">
@@ -37,7 +37,8 @@
       <button id="addTechnology" class="secondary" type="button" data-i18n="addTechnology">+ Add technology</button>
       <button id="copyLink" class="secondary" type="button" data-i18n="s10">Copy share link</button>
     </section>
-    <div id="technologyList">
+    <p id="globalValidation" class="validation" role="alert" hidden></p>
+    <div id="technologyList" hidden>
     <section class="technology-block" data-chart-prefix="">
     <div class="section-head technology-heading"><h2 data-field="technologyTitle">Technology</h2><button type="button" class="secondary remove-technology" data-i18n="removeTechnology" disabled>Remove</button></div>
     <section class="panel controls resource-controls" aria-label="Calculator settings" data-i18n-aria="Calculator settings">
@@ -84,7 +85,8 @@
       <summary><span class="charts-closed" data-i18n="showCharts">Show charts</span><span class="charts-open" data-i18n="hideCharts">Hide charts</span><span class="charts-caption" data-i18n="chartsCaption">Output gain and MSU per +1%</span></summary>
       <section id="gainCharts" class="gain-charts" aria-label="Lithium output gain charts" data-i18n-aria="Lithium output gain charts"></section>
     </details>
-    <section class="panel table-panel">
+    <details id="tablePanel" class="panel table-panel technology-table">
+      <summary><span class="table-closed" data-i18n="showTable">Show upgrade table</span><span class="table-open" data-i18n="hideTable">Hide upgrade table</span></summary>
       <div class="section-head">
         <div>
           <p class="eyebrow" data-i18n="s15">Upgrade path</p>
@@ -112,11 +114,11 @@
           <tbody id="results"></tbody>
         </table>
       </div>
-    </section>
+    </details>
 
     </section>
     </div>
-    <section class="panel formulas">
+    <section id="technologyHelp" class="panel formulas" hidden>
       <div>
         <p class="eyebrow" data-i18n="s26">Formulas used</p>
         <h2 data-i18n="s27">How it is calculated</h2>
@@ -141,14 +143,23 @@
       <p class="note" data-i18n="s34">“Output gain” refers to lithium/hour only. The Orion loot formula is unconfirmed; these percentages are not confirmed loot gains. Percentage gains from IAS 0 are undefined and shown as N/A.</p>
     </section>
 
-    <footer>
+    <section id="combinedSummary" class="panel combined-summary" aria-live="polite" hidden>
+      <h2 data-i18n="combinedHeading">All selected technologies</h2>
+      <p id="combinedValidation" class="validation" hidden></p>
+      <div class="summary-grid">
+        <article class="stat"><span data-i18n="combinedCostLabel">Total upgrade cost</span><strong id="combinedCost">—</strong><small id="combinedCostExact">—</small></article>
+        <article id="combinedResourcesCard" class="stat"><span data-i18n="combinedResourcesLabel">Resource reward gains</span><div id="combinedResourceGains"></div><small data-i18n="combinedResourcesHelp">Each percentage applies to its resource; different resource percentages are not added together.</small></article>
+        <article id="combinedLithiumCard" class="stat"><span data-i18n="combinedLithiumLabel">Lithium reward gain</span><strong id="combinedLithiumGain">—</strong><small data-i18n="combinedLithiumHelp">Lithium is shown separately; its upgrade cost is included in the total MSU.</small></article>
+      </div>
+    </section>
+    <footer id="technologyFooter" hidden>
       <span data-i18n="s35">Unofficial community calculator for OGame Project Orion.</span>
       <span data-i18n="s36">Mechanics may change while Orion is being tested.</span>
     </footer>
   </main>
 
   <noscript><p>This calculator requires JavaScript. Please enable it to see the results.</p></noscript>
-  <script src="resources.js?v=20261012-planets"></script>
+  <script src="resources.js?v=20261012-compact"></script>
   <script src="app.js?v=20261012-technologies"></script>
 </body>
 </html>
