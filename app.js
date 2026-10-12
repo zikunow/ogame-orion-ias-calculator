@@ -676,7 +676,7 @@ els.copyLink.addEventListener("click", async () => {
 });
 
 loadFromUrl();
-Object.assign(staticTranslations, { navIas: {en: "IAS calculator", ru: "Калькулятор IAS"}, navResources: {en: "Resource bonuses", ru: "Ресурсные бонусы"} });
+Object.assign(staticTranslations, { navIas: {en: "IAS", ru: "IAS"}, navResources: {en: "Technologies", ru: "Технологии"} });
 russian["Calculators"] = "Калькуляторы";
 if (resourceMode) initializeResources();
 $("themeSelect").addEventListener("change", event => setTheme(event.target.value));

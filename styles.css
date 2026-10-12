@@ -454,6 +454,16 @@ body[data-calculator="resources"] [hidden] { display: none !important; }
 .combined-gain strong { font-size: 22px; }
 .technology-heading { gap: 12px; margin-bottom: 18px; }
 .technology-heading h2 { font-size: 20px; margin: 0; }
+.header-actions .calculator-tabs { margin: 0; gap: 0; flex-wrap: nowrap; }
+.header-calculators a { background: var(--panel); white-space: nowrap; font-size: 13px; padding: 10px 12px; }
+.header-calculators a:first-child { border-radius: 6px 0 0 6px; }
+.header-calculators a:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+.header-actions { flex: 0 1 auto; flex-wrap: wrap; max-width: 100%; justify-content: flex-end; }
+.hero > div { min-width: 0; }
+.technology-empty { min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 36px 18px; color: var(--muted); }
+.technology-empty h2 { color: var(--text); font-size: 20px; margin: 0 0 8px; }
+.technology-empty p { margin: 0; max-width: 480px; }
+@media (max-width: 1250px) { .hero { flex-direction: column; } .header-actions { justify-content: flex-start; } }
 .technology-heading .remove-technology { flex-shrink: 0; }
 .building-info { color: var(--muted); font-size: 13px; }
 @media (max-width: 700px) {

@@ -57,6 +57,8 @@ function initializeResources() {
     sharedPlanets: ["Planet count applies to every technology below.", "Количество планет применяется ко всем технологиям ниже."],
     addTechnology: ["+ Add technology", "+ Добавить технологию"],
     removeTechnology: ["Remove", "Удалить"],
+    emptyTechnologyTitle: ["No technology selected", "Технология не выбрана"],
+    emptyTechnologyHelp: ["Click “Add technology” to start your calculation.", "Нажмите «Добавить технологию», чтобы начать расчёт."],
     showTable: ["Show upgrade table", "Показать таблицу улучшений"],
     hideTable: ["Hide upgrade table", "Скрыть таблицу улучшений"],
     combinedHeading: ["All selected technologies", "Итог по всем технологиям"],
@@ -220,6 +222,7 @@ function renderResources() {
   $("globalValidation").textContent = globalError;
   $("ratioValue").textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
   for (const id of ["technologyHelp", "technologyFooter", "combinedSummary"]) $(id).hidden = !plans.length;
+  $("technologyEmpty").hidden = Boolean(plans.length);
   const saved = Object.fromEntries(scopedResourceFields.map(key => [key, els[key]]));
   let valid = !globalError;
   try {
