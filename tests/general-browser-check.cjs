@@ -10,6 +10,13 @@ const {chromium} = require('playwright');
   assert.equal(await page.locator('#pveGainValue').textContent(),'+12.00%');
   assert.equal(await page.locator('#pvpGainValue').textContent(),'+18.00%');
   assert.equal(await page.locator('#labDiscount').textContent(),'−5.00%');
+  const positions=await page.evaluate(()=>Object.fromEntries(['planets','raceSelect','labLevel','fromLevel','toLevel','missionSelect','copyLink'].map(id=>{const r=document.getElementById(id).getBoundingClientRect();return [id,{top:r.top,height:r.height}];})));
+  if(width>1100){
+   assert.ok(Math.abs(positions.planets.top-positions.raceSelect.top)<1);
+   assert.ok(Math.abs(positions.planets.top-positions.labLevel.top)<1);
+   assert.ok(Math.abs(positions.fromLevel.top-positions.copyLink.top)<1);
+   assert.ok(Math.abs(positions.fromLevel.top-positions.missionSelect.top)<1);
+  }
   assert.equal(await page.locator('#chartsPanel').getAttribute('open'),null);
   assert.equal(await page.locator('#tablePanel').getAttribute('open'),null);
   const cost=await page.locator('#upgradeCostExact').textContent();
