@@ -1,6 +1,7 @@
 let resourceRenderScope = null;
 const $ = (id) => resourceRenderScope?.querySelector(`[data-field="${id}"]`) || document.getElementById(id);
 const resourceMode = document.body?.dataset?.calculator === "resources";
+const generalMode = document.body?.dataset?.calculator === "general";
 
 const els = {
   planets: $("planets"),
@@ -283,7 +284,7 @@ function initialTheme() {
   try { return localStorage.getItem("ias-theme") === "cosmic" ? "cosmic" : "minimal"; } catch { return "minimal"; }
 }
 function t(text, values = {}) {
-  let translated = resourceMode && resourceText[text] ? resourceText[text][language] : language === "ru" ? (russian[text] ?? text) : text;
+  let translated = generalMode && generalText[text] ? generalText[text][language] : resourceMode && resourceText[text] ? resourceText[text][language] : language === "ru" ? (russian[text] ?? text) : text;
   for (const [key, value] of Object.entries(values)) translated = translated.replaceAll("{" + key + "}", value);
   return translated;
 }
@@ -325,6 +326,7 @@ function initialLanguage() {
 }
 
 function costAtLevel(level) {
+  if (generalMode) return generalCostAtLevel(level, inputNumber($("labLevel")));
   if (resourceMode) return resourceCostAtLevel(level, $("resourceSelect").value);
   if (level === 0) return { metal: 0, crystal: 0, deut: 0 };
   // Rational arithmetic avoids floating point errors at whole-unit boundaries.
@@ -341,7 +343,7 @@ function lithiumPerPlanet(level) {
 }
 
 function outputAtLevel(level) {
-  return resourceMode ? resourceFactor(level) : lithiumPerPlanet(level);
+  return generalMode ? generalRewardFactor(level, generalSettings()) : resourceMode ? resourceFactor(level) : lithiumPerPlanet(level);
 }
 
 function msu(resources, ratio) {
@@ -465,7 +467,8 @@ function syncNavigation(url = new URL(window.location.href)) {
     const destination = new URL(link.getAttribute("href"), url);
     for (const key of ["p", "mr", "cr", "dr", "lang", "theme"]) if (url.searchParams.has(key)) destination.searchParams.set(key, url.searchParams.get(key));
     link.setAttribute("href", destination.href);
-    if (destination.pathname.endsWith("resources.html") === resourceMode) link.setAttribute("aria-current", "page");
+    const current = resourceMode ? "resources.html" : generalMode ? "general.html" : "index.html";
+    if (destination.pathname.endsWith(current)) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
 }
@@ -572,6 +575,7 @@ function renderCharts(state) {
 }
 
 function render() {
+  if (generalMode) return renderGeneral();
   if (resourceMode) return renderResources();
   const ratioValue = $("ratioValue");
   if (ratioValue) ratioValue.textContent = [els.ratioMetal, els.ratioCrystal, els.ratioDeut].map(input => input.value || "—").join(":");
@@ -676,9 +680,10 @@ els.copyLink.addEventListener("click", async () => {
 });
 
 loadFromUrl();
-Object.assign(staticTranslations, { navIas: {en: "IAS", ru: "IAS"}, navResources: {en: "Technologies", ru: "Технологии"} });
+Object.assign(staticTranslations, { navIas: {en: "IAS", ru: "IAS"}, navResources: {en: "Technologies", ru: "Технологии"}, navGeneral: {en: "General T18", ru: "T18 Генерала"} });
 russian["Calculators"] = "Калькуляторы";
 if (resourceMode) initializeResources();
+if (generalMode) initializeGeneral();
 $("themeSelect").addEventListener("change", event => setTheme(event.target.value));
 setTheme(initialTheme(), false);
 $("langEn").addEventListener("click", () => setLanguage("en"));

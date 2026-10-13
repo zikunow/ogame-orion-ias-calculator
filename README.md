@@ -92,7 +92,7 @@ Checks cover supplied lithium values, cost scaling, cumulative totals, custom MS
 
 ## Deployment
 
-GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks and uploads only `index.html`, `resources.html`, `styles.css`, `app.js`, `resources.js` and `.nojekyll`, then deploys on pushes to `main` or manual dispatch.
+GitHub Pages uses the workflow in `.github/workflows/pages.yml`. It runs checks and uploads only `index.html`, `resources.html`, `general.html`, `styles.css`, `app.js`, `resources.js`, `general.js` and `.nojekyll`, then deploys on pushes to `main` or manual dispatch.
 
 Pages must first be enabled in **Settings → Pages → Build and deployment → Source: GitHub Actions**. The regular workflow `GITHUB_TOKEN` can deploy an enabled site but cannot perform its initial enablement. The previous failure at Configure Pages was caused by trying to enable the site using that token.
 
@@ -120,3 +120,24 @@ Each resource cost is `floor(base × 1.5^(L−1))`, then multiplied by planets. 
 Bonuses always add across all selected planets: `bonus = 0.002 × level × planets`. There is no stacking switch. Legacy `stack=0` or `stack=1` URL parameters are ignored and removed from normalized share links. Relative reward gain compares `(1 + target bonus) / (1 + starting bonus) − 1`; other reward modifiers, unlock mission costs, production, payback time, and absolute mission loot are excluded. Cost efficiency is upgrade MSU divided by the relative reward gain in percentage points, not by the raw building bonus.
 
 Resource building levels are limited to 0–50 for numeric precision; this is a calculator range, not a claimed game cap. Unit tests cover resource costs, rounding, planet scaling and zero-start behavior; live browser checks cover all three resources, themes, languages and desktop/mobile layouts.
+
+## General T18 calculator
+
+Open [General T18](https://zikunow.github.io/ogame-orion-ias-calculator/general.html). Choose planets, the active lifeform and its research-discount building level, then starting and target Mechan General Enhancement levels. Every planet uses the same settings. EN/RU, both designs and the editable MSU ratio are shared with the other calculators.
+
+Costs come from the official [Lifeform Master](https://ogame.comastuff.com/LFMaster_Global.xlsx), current PTS values inspected 13 October 2026. T18 costs per resource per planet are `floor(base × L × 1.7^(L−1) × (1−D))`, with base 300,000 / 180,000 / 120,000. Discount `D = min(0.0025 × H, 0.25)` is local, not multiplied by planets. Research time reduction is `min(0.02 × H, 0.99)`; absolute research duration is not calculated.
+
+| Active lifeform | Discount building | Base Metal | Crystal | Deuterium |
+| --- | --- | ---: | ---: | ---: |
+| Humans | Research Centre | 20,000 | 25,000 | 10,000 |
+| Rock’tal | Rune Technologium | 40,000 | 10,000 | 15,000 |
+| Mecha | Robotics Research Centre | 30,000 | 20,000 | 10,000 |
+| Kaelesh | Vortex Chamber | 20,000 | 15,000 | 15,000 |
+
+Building resource costs are `floor(base × H × 1.3^(H−1))`. Optional building investment sums construction from 0 to H on every selected planet, adds it once to the overall total, and shows its own MSU/resource breakdown. Other building discounts are excluded. T18 table costs and efficiency charts exclude this optional capital cost.
+
+T18 strengthens the General class bonus by `E = 0.002 × planets × L × (1 + 0.001 × lifeformExperienceLevel + buildingTechnologyBoost)`, where the building boost is a decimal. Experience and effect-building bonuses add. Optional modifiers default to zero and apply equally on all planets. The General class must be active.
+
+The Orion reward model uses a +50% General bonus for PvE and +100% for PvP: `PvE = 1 + 0.5 × (1+E)` and `PvP = 1 + 1.0 × (1+E)`. PvP's separate mission reward multiplier belongs to the underlying base reward and is not counted twice. Relative gains compare target/start reward multipliers. With 18 planets and T18 0→10, PvE is 1.50→1.68 (+12%) and PvP is 2.00→2.36 (+18%). Unlock costs, other reward modifiers, absolute rewards and payback are excluded.
+
+Three collapsed charts and a collapsed table show marginal gain, gain from the selected start and T18 MSU per +1% relative reward gain for the selected PvE/PvP mode. Both PvE and PvP summary gains are always visible. Share links preserve race, building level, inclusion checkbox, modifiers and mission mode alongside the common settings. Integer resource calculations are exact; MSU is approximate at very large totals. Unit and live browser checks cover costs, modifiers, inclusion semantics, both languages/designs and mobile layouts.

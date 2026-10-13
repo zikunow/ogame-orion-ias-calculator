@@ -24,7 +24,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html resources.html styles.css app.js resources.js .nojekyll _site/
+          cp index.html resources.html general.html styles.css app.js resources.js general.js .nojekyll _site/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -60,3 +60,4 @@ jobs:
         run: |
           node tests/browser-check.cjs
           node tests/resources-browser-check.cjs
+          node tests/general-browser-check.cjs

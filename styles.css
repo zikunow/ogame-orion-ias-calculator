@@ -504,3 +504,22 @@ html[data-theme="minimal"] .ratio-popover { background: #fff; }
   .charts-caption { display: none; }
 }
 @media (max-width: 400px) { .controls { grid-template-columns: 1fr; } }
+/* General T18 shares both designs with the existing calculators. */
+.header-calculators a { border-radius: 0; margin-left: -1px; }
+.header-calculators a:first-child { margin-left: 0; }
+.general-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 16px; }
+.general-controls select { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 6px; padding: 0 10px; background: var(--panel); color: var(--text); font: inherit; }
+.general-controls small { display: block; color: var(--muted); margin-top: 6px; }
+.general-discount { padding: 20px; margin-bottom: 16px; }
+.general-discount > strong { font-size: 24px; margin: 0 16px; }
+.general-discount small { color: var(--muted); overflow-wrap: anywhere; }
+.check-label { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+.check-label input { width: 18px; height: 18px; flex: 0 0 18px; }
+#buildingCostInfo { margin-top: 12px; }
+.general-modifiers { margin-bottom: 20px; padding: 16px 20px; }
+.general-modifiers > summary { cursor: pointer; }
+.general-modifiers .controls { margin-top: 16px; }
+.general-modifiers:not([open]) .controls { display: none; }
+body[data-calculator="general"] .formula-grid code { white-space: normal; overflow-wrap: anywhere; }
+body[data-calculator="general"] .stat small { overflow-wrap: anywhere; }
+@media (max-width: 700px) { .general-controls { grid-template-columns: 1fr; } .general-discount > small { display: block; margin-top: 6px; } }
