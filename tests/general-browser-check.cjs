@@ -19,6 +19,13 @@ const {chromium} = require('playwright');
   }
   assert.equal(await page.locator('#chartsPanel').getAttribute('open'),null);
   assert.equal(await page.locator('#tablePanel').getAttribute('open'),null);
+  await page.locator('.general-modifiers > summary').click();
+  await page.locator('#lifeformLevel').fill('50');
+  assert.match(await page.locator('#lifeformBonus').textContent(), /\+5.00%.*Maximum: \+10% at level 100/);
+  await page.locator('#lifeformLevel').fill('100');
+  assert.match(await page.locator('#lifeformBonus').textContent(), /boost: \+10.00%/);
+  await page.locator('#lifeformLevel').fill('0');
+  await page.locator('.general-modifiers > summary').click();
   const cost=await page.locator('#upgradeCostExact').textContent();
   await page.locator('#includeBuilding').check();
   assert.ok(await page.locator('#buildingCostInfo').isVisible());

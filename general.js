@@ -100,6 +100,8 @@ function renderGeneral() {
   els.validation.hidden=!error;els.validation.textContent=error;els.copyLink.disabled=Boolean(error);
   $("ratioValue").textContent=[els.ratioMetal,els.ratioCrystal,els.ratioDeut].map(input=>input.value||"—").join(":");
   $("buildingCostInfo").hidden=!state.includeBuilding;
+  const validExperience=Number.isInteger(state.lifeformLevel)&&state.lifeformLevel>=0&&state.lifeformLevel<=100;
+  $("lifeformBonus").textContent=(language==="ru"?"Усиление эффекта технологий: ":"Technology effect boost: ")+(validExperience?"+"+fmtPct(state.lifeformLevel*.001):"—")+(language==="ru"?" · Максимум: +10% при уровне 100":" · Maximum: +10% at level 100");
   const summaryIds=["upgradeCost","upgradeCostExact","t18Breakdown","enhancementValue","enhancementFrom","pveGainValue","pveMultiplier","pvpGainValue","pvpMultiplier","labDiscount","labTime","buildingCostExact","resourceTotals"];
   if(error){for(const id of summaryIds) $(id).textContent="—";els.results.innerHTML="";$("gainCharts").innerHTML="";return;}
   $("labName").textContent=generalLabs[state.race][language];
